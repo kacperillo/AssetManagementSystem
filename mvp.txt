@@ -1,0 +1,31 @@
+# Aplikacja - AssetManagementSystem (MVP)
+
+### Główny problem
+Firma zatrudnia pracowników (Employees) oraz posiada zasoby (Assets), takie jak laptopy, smartfony, tablety, drukarki, słuchawki i przydziela je pracownikom. Potrzebny jest system zarządzania tymi zasobami i zapisywania historii przydziału urządzeń do poszczególnych pracowników (Assignments).
+
+### Dane
+- Asset - ID, AssetType, vendor, model, seriesNumber
+- AssetType - LAPTOP, SMARTPHONE, TABLET, PRINTER, HEADPHONES
+- Employee - ID, fullName, hiredFrom, hiredUntil
+- Assignment - ID, assetId, employeeId, assignedFrom, assignedUntil, active  
+
+### Najmniejszy zestaw funkcjonalności
+- Administrator może dodawać nowych pracowników
+- Administrator może wyświetlać wszystkich pracowników
+- Administrator może dodawać nowe zasoby lub oznaczać zasoby jako nieaktywne (o ile nie są przydzielone do żadnego pracownika)
+- Administrator może wyświetlać wszystkie zasoby
+- Pracownik może wyświetlać wyłącznie swoje własne, aktywne zasoby
+- Pracownik może wyświetlać historię wszystkich swoich poprzednich przydziałów (w tym może zobaczyć dane zasobów, których obecnie nie posiada, ale posiadał w przeszłości)
+- Administrator może wyświetlać całą historię przydziałów z możliwością filtrowania po konretnym zasobie lub konkretnym pracowniku 
+- Użytkownicy (Pracownicy oraz Administrator) używają swojego adresu email i hasła, aby zalogować się do systemu
+
+
+### Co NIE wchodzi w zakres MVP
+- Rozbudowane informacje o pracownikach czy zasobach
+- Aplikacje mobilne (tylko web)
+- Wiele kont administratorów
+- Hierarchia pracowników
+- Integracja z innymi systemami zarządzania firmą
+
+### Kryteria sukcesu
+- Poprawna kontrola dostępu (Pracownicy nie mogą widzieć danych innych pracowników), jedynie Administrator może dodać pracowników lub zasoby oraz zarządzać przydziałem zasobów

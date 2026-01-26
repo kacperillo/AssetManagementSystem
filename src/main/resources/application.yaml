@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: AssetManagement
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/assetmanagement?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+jwt:
+  secret: eec6fbed57322cfb2fff873b8495121553bd4b0cbf7153f067a8edf3cba41da2
+  expiration: 86400000
+
