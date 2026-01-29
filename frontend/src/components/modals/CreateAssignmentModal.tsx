@@ -4,16 +4,21 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Alert, TextField, MenuItem } from '@mui/material';
 import Modal from '../forms/Modal';
-import FormField from '../forms/FormField';
 import { createAssignment } from '../../api/assignments';
 import { Employee } from '../../api/employees';
 import { Asset } from '../../api/assets';
 import { AxiosError } from 'axios';
 
+const getTodayDate = () => new Date().toISOString().split('T')[0];
+
 const schema = z.object({
   employeeId: z.string().min(1, 'Pracownik jest wymagany'),
   assetId: z.string().min(1, 'Zasób jest wymagany'),
-  assignedFrom: z.string().min(1, 'Data rozpoczęcia jest wymagana'),
+  assignedFrom: z.string()
+    .min(1, 'Data rozpoczęcia jest wymagana')
+    .refine((date) => date <= getTodayDate(), {
+      message: 'Data nie może być w przyszłości',
+    }),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -36,6 +41,8 @@ export default function CreateAssignmentModal({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const today = getTodayDate();
+
   const {
     register,
     handleSubmit,
@@ -43,6 +50,9 @@ export default function CreateAssignmentModal({
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      assignedFrom: today,
+    },
   });
 
   // Filtruj tylko dostępne zasoby (aktywne i nieprzypisane)
@@ -135,13 +145,19 @@ export default function CreateAssignmentModal({
           ))}
         </TextField>
 
-        <FormField
+        <TextField
           label="Data rozpoczęcia"
-          name="assignedFrom"
           type="date"
-          register={register}
-          error={errors.assignedFrom}
+          {...register('assignedFrom')}
+          error={!!errors.assignedFrom}
+          helperText={errors.assignedFrom?.message}
+          fullWidth
+          margin="normal"
           required
+          slotProps={{
+            inputLabel: { shrink: true },
+            htmlInput: { max: today },
+          }}
         />
       </form>
     </Modal>

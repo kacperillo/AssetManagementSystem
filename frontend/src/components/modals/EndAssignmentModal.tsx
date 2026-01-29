@@ -1,18 +1,26 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, Alert, Typography } from '@mui/material';
+import { Button, Alert, Typography, TextField } from '@mui/material';
 import Modal from '../forms/Modal';
-import FormField from '../forms/FormField';
 import { endAssignment, Assignment } from '../../api/assignments';
 import { AxiosError } from 'axios';
 
-const schema = z.object({
-  assignedUntil: z.string().min(1, 'Data zakończenia jest wymagana'),
+const getTodayDate = () => new Date().toISOString().split('T')[0];
+
+const createSchema = (assignedFrom: string) => z.object({
+  assignedUntil: z.string()
+    .min(1, 'Data zakończenia jest wymagana')
+    .refine((date) => date <= getTodayDate(), {
+      message: 'Data nie może być w przyszłości',
+    })
+    .refine((date) => date >= assignedFrom, {
+      message: 'Data zakończenia nie może być przed datą rozpoczęcia',
+    }),
 });
 
-type FormData = z.infer<typeof schema>;
+type FormData = { assignedUntil: string };
 
 interface EndAssignmentModalProps {
   open: boolean;
@@ -30,6 +38,14 @@ export default function EndAssignmentModal({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const today = getTodayDate();
+  const assignedFrom = assignment?.assignedFrom?.toString() ?? '';
+
+  const schema = useMemo(
+    () => createSchema(assignedFrom),
+    [assignedFrom]
+  );
+
   const {
     register,
     handleSubmit,
@@ -37,6 +53,9 @@ export default function EndAssignmentModal({
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      assignedUntil: today,
+    },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -96,13 +115,19 @@ export default function EndAssignmentModal({
       </Typography>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <FormField
+        <TextField
           label="Data zakończenia"
-          name="assignedUntil"
           type="date"
-          register={register}
-          error={errors.assignedUntil}
+          {...register('assignedUntil')}
+          error={!!errors.assignedUntil}
+          helperText={errors.assignedUntil?.message}
+          fullWidth
+          margin="normal"
           required
+          slotProps={{
+            inputLabel: { shrink: true },
+            htmlInput: { min: assignedFrom, max: today },
+          }}
         />
       </form>
     </Modal>

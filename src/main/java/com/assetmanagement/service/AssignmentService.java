@@ -64,6 +64,10 @@ public class AssignmentService {
       throw new ApplicationException(HttpStatus.BAD_REQUEST, "Przydział został już zakończony");
     }
 
+    if (request.getAssignedUntil().isBefore(assignment.getAssignedFrom())) {
+      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Data zakończenia nie może być przed datą rozpoczęcia");
+    }
+
     assignment.setAssignedUntil(request.getAssignedUntil());
     Assignment saved = assignmentRepository.save(assignment);
     return mapToResponse(saved);
