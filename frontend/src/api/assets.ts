@@ -38,13 +38,32 @@ export interface MyAsset {
   assignedFrom: string;
 }
 
+export interface AssetFilters {
+  isActive?: boolean | null;
+  assetType?: AssetType | null;
+  isAssigned?: boolean | null;
+}
+
 export const getAssets = async (
   page: number = 0,
   size: number = 10,
-  sort: string = 'id,asc'
+  sort: string = 'id,asc',
+  filters?: AssetFilters
 ): Promise<PagedResponse<Asset>> => {
+  const params: Record<string, unknown> = { page, size, sort };
+
+  if (filters?.isActive !== undefined && filters.isActive !== null) {
+    params.isActive = filters.isActive;
+  }
+  if (filters?.assetType !== undefined && filters.assetType !== null) {
+    params.assetType = filters.assetType;
+  }
+  if (filters?.isAssigned !== undefined && filters.isAssigned !== null) {
+    params.isAssigned = filters.isAssigned;
+  }
+
   const response = await apiClient.get<PagedResponse<Asset>>('/admin/assets', {
-    params: { page, size, sort },
+    params,
   });
   return response.data;
 };

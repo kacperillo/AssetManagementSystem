@@ -5,6 +5,7 @@ import com.assetmanagement.dto.response.AssetResponse;
 import com.assetmanagement.dto.response.EmployeeAssetResponse;
 import com.assetmanagement.exception.ApplicationException;
 import com.assetmanagement.model.Asset;
+import com.assetmanagement.model.AssetType;
 import com.assetmanagement.model.Assignment;
 import com.assetmanagement.model.Employee;
 import com.assetmanagement.repository.AssetRepository;
@@ -60,8 +61,8 @@ public class AssetService {
   }
 
   @Transactional(readOnly = true)
-  public PagedResponse<AssetResponse> getAllAssets(Pageable pageable) {
-    Page<Asset> assetPage = assetRepository.findAll(pageable);
+  public PagedResponse<AssetResponse> getAllAssets(Pageable pageable, Boolean isActive, AssetType assetType, Boolean isAssigned) {
+    Page<Asset> assetPage = findAssets(pageable, isActive, assetType, isAssigned);
 
     List<AssetResponse> content = assetPage.getContent().stream()
             .map(asset -> {
@@ -80,6 +81,39 @@ public class AssetService {
             assetPage.getTotalPages(),
             assetPage.isLast()
     );
+  }
+
+  private Page<Asset> findAssets(Pageable pageable, Boolean isActive, AssetType assetType, Boolean isAssigned) {
+    if (isActive != null && assetType != null && isAssigned != null) {
+      return isAssigned
+              ? assetRepository.findByIsActiveAndAssetTypeAndAssigned(isActive, assetType, pageable)
+              : assetRepository.findByIsActiveAndAssetTypeAndUnassigned(isActive, assetType, pageable);
+    }
+    if (isActive != null && assetType != null) {
+      return assetRepository.findByIsActiveAndAssetType(isActive, assetType, pageable);
+    }
+    if (isActive != null && isAssigned != null) {
+      return isAssigned
+              ? assetRepository.findByIsActiveAndAssigned(isActive, pageable)
+              : assetRepository.findByIsActiveAndUnassigned(isActive, pageable);
+    }
+    if (assetType != null && isAssigned != null) {
+      return isAssigned
+              ? assetRepository.findByAssetTypeAndAssigned(assetType, pageable)
+              : assetRepository.findByAssetTypeAndUnassigned(assetType, pageable);
+    }
+    if (isActive != null) {
+      return assetRepository.findByIsActive(isActive, pageable);
+    }
+    if (assetType != null) {
+      return assetRepository.findByAssetType(assetType, pageable);
+    }
+    if (isAssigned != null) {
+      return isAssigned
+              ? assetRepository.findAssigned(pageable)
+              : assetRepository.findUnassigned(pageable);
+    }
+    return assetRepository.findAll(pageable);
   }
 
   @Transactional(readOnly = true)

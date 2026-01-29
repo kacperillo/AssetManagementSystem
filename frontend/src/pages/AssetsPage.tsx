@@ -1,13 +1,29 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Box, Button, Typography, Chip, Tooltip, IconButton } from '@mui/material';
+import {
+  Box,
+  Button,
+  Typography,
+  Chip,
+  Tooltip,
+  IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormLabel,
+  Paper,
+} from '@mui/material';
 import { Add, Block } from '@mui/icons-material';
 import DataTable, { Column } from '../components/data/DataTable';
 import Pagination from '../components/data/Pagination';
 import AddAssetModal from '../components/modals/AddAssetModal';
 import ConfirmDialog from '../components/forms/ConfirmDialog';
 import ErrorMessage from '../components/feedback/ErrorMessage';
-import { getAssets, deactivateAsset, Asset } from '../api/assets';
+import { getAssets, deactivateAsset, Asset, AssetType, AssetFilters } from '../api/assets';
 
 const assetTypeLabels: Record<string, string> = {
   LAPTOP: 'Laptop',
@@ -17,6 +33,9 @@ const assetTypeLabels: Record<string, string> = {
   HEADPHONES: 'Słuchawki',
 };
 
+type StatusFilter = 'all' | 'active' | 'inactive';
+type AssignedFilter = 'all' | 'assigned' | 'unassigned';
+
 export default function AssetsPage() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
@@ -24,14 +43,23 @@ export default function AssetsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [assetTypeFilter, setAssetTypeFilter] = useState<AssetType | ''>('');
+  const [assignedFilter, setAssignedFilter] = useState<AssignedFilter>('all');
+
+  const filters: AssetFilters = {
+    isActive: statusFilter === 'all' ? null : statusFilter === 'active',
+    assetType: assetTypeFilter || null,
+    isAssigned: assignedFilter === 'all' ? null : assignedFilter === 'assigned',
+  };
 
   const {
     data,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['assets', page, size],
-    queryFn: () => getAssets(page, size),
+    queryKey: ['assets', page, size, statusFilter, assetTypeFilter, assignedFilter],
+    queryFn: () => getAssets(page, size, 'id,asc', filters),
   });
 
   const deactivateMutation = useMutation({
@@ -114,6 +142,21 @@ export default function AssetsPage() {
     },
   ];
 
+  const handleStatusFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setStatusFilter(event.target.value as StatusFilter);
+    setPage(0);
+  };
+
+  const handleAssetTypeFilterChange = (value: AssetType | '') => {
+    setAssetTypeFilter(value);
+    setPage(0);
+  };
+
+  const handleAssignedFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAssignedFilter(event.target.value as AssignedFilter);
+    setPage(0);
+  };
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -126,6 +169,52 @@ export default function AssetsPage() {
           Dodaj zasób
         </Button>
       </Box>
+
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Box sx={{ display: 'flex', gap: 4, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Status</FormLabel>
+            <RadioGroup
+              row
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+            >
+              <FormControlLabel value="all" control={<Radio size="small" />} label="Wszystkie" />
+              <FormControlLabel value="active" control={<Radio size="small" />} label="Aktywne" />
+              <FormControlLabel value="inactive" control={<Radio size="small" />} label="Nieaktywne" />
+            </RadioGroup>
+          </FormControl>
+
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Przypisanie</FormLabel>
+            <RadioGroup
+              row
+              value={assignedFilter}
+              onChange={handleAssignedFilterChange}
+            >
+              <FormControlLabel value="all" control={<Radio size="small" />} label="Wszystkie" />
+              <FormControlLabel value="assigned" control={<Radio size="small" />} label="Przypisane" />
+              <FormControlLabel value="unassigned" control={<Radio size="small" />} label="Nieprzypisane" />
+            </RadioGroup>
+          </FormControl>
+
+          <FormControl sx={{ minWidth: 200 }} size="small">
+            <InputLabel>Typ zasobu</InputLabel>
+            <Select
+              value={assetTypeFilter}
+              label="Typ zasobu"
+              onChange={(e) => handleAssetTypeFilterChange(e.target.value as AssetType | '')}
+            >
+              <MenuItem value="">Wszystkie typy</MenuItem>
+              <MenuItem value="LAPTOP">Laptop</MenuItem>
+              <MenuItem value="SMARTPHONE">Smartfon</MenuItem>
+              <MenuItem value="TABLET">Tablet</MenuItem>
+              <MenuItem value="PRINTER">Drukarka</MenuItem>
+              <MenuItem value="HEADPHONES">Słuchawki</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </Paper>
 
       {error && <ErrorMessage message="Błąd podczas pobierania zasobów" />}
 

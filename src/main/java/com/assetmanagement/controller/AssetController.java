@@ -4,6 +4,7 @@ import com.assetmanagement.dto.request.CreateAssetRequest;
 import com.assetmanagement.dto.response.AssetResponse;
 import com.assetmanagement.dto.response.EmployeeAssetResponse;
 import com.assetmanagement.dto.response.PagedResponse;
+import com.assetmanagement.model.AssetType;
 import com.assetmanagement.service.AssetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,12 +39,15 @@ public class AssetController {
           @RequestParam(defaultValue = "0") int page,
           @RequestParam(defaultValue = "20") int size,
           @RequestParam(defaultValue = "id") String sortBy,
-          @RequestParam(defaultValue = "asc") String sortDir) {
+          @RequestParam(defaultValue = "asc") String sortDir,
+          @RequestParam(required = false) Boolean isActive,
+          @RequestParam(required = false) AssetType assetType,
+          @RequestParam(required = false) Boolean isAssigned) {
     Sort sort = sortDir.equalsIgnoreCase("desc")
             ? Sort.by(sortBy).descending()
             : Sort.by(sortBy).ascending();
     Pageable pageable = PageRequest.of(page, size, sort);
-    PagedResponse<AssetResponse> assets = assetService.getAllAssets(pageable);
+    PagedResponse<AssetResponse> assets = assetService.getAllAssets(pageable, isActive, assetType, isAssigned);
     return ResponseEntity.ok(assets);
   }
 

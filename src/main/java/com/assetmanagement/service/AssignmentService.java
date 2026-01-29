@@ -81,8 +81,8 @@ public class AssignmentService {
   }
 
   @Transactional(readOnly = true)
-  public PagedResponse<AssignmentResponse> getAllAssignments(Pageable pageable) {
-    Page<Assignment> assignmentPage = assignmentRepository.findAll(pageable);
+  public PagedResponse<AssignmentResponse> getAllAssignments(Pageable pageable, Boolean isActive, Long employeeId, Long assetId) {
+    Page<Assignment> assignmentPage = findAssignments(pageable, isActive, employeeId, assetId);
 
     List<AssignmentResponse> content = assignmentPage.getContent().stream()
             .map(this::mapToResponse)
@@ -96,6 +96,48 @@ public class AssignmentService {
             assignmentPage.getTotalPages(),
             assignmentPage.isLast()
     );
+  }
+
+  private Page<Assignment> findAssignments(Pageable pageable, Boolean isActive, Long employeeId, Long assetId) {
+    // Oba filtry: pracownik i zasób
+    if (employeeId != null && assetId != null) {
+      if (isActive != null) {
+        return isActive
+                ? assignmentRepository.findActiveByEmployeeIdAndAssetId(employeeId, assetId, pageable)
+                : assignmentRepository.findEndedByEmployeeIdAndAssetId(employeeId, assetId, pageable);
+      }
+      return assignmentRepository.findByEmployeeIdAndAssetId(employeeId, assetId, pageable);
+    }
+
+    // Tylko pracownik
+    if (employeeId != null) {
+      if (isActive != null) {
+        return isActive
+                ? assignmentRepository.findActiveByEmployeeIdPaged(employeeId, pageable)
+                : assignmentRepository.findEndedByEmployeeId(employeeId, pageable);
+      }
+      return assignmentRepository.findByEmployeeId(employeeId, pageable);
+    }
+
+    // Tylko zasób
+    if (assetId != null) {
+      if (isActive != null) {
+        return isActive
+                ? assignmentRepository.findActiveByAssetIdPaged(assetId, pageable)
+                : assignmentRepository.findEndedByAssetId(assetId, pageable);
+      }
+      return assignmentRepository.findByAssetId(assetId, pageable);
+    }
+
+    // Tylko status
+    if (isActive != null) {
+      return isActive
+              ? assignmentRepository.findActive(pageable)
+              : assignmentRepository.findEnded(pageable);
+    }
+
+    // Brak filtrów
+    return assignmentRepository.findAll(pageable);
   }
 
   @Transactional(readOnly = true)

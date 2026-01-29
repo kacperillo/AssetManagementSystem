@@ -43,29 +43,20 @@ public class AssignmentController {
 
   @GetMapping("/admin/assignments")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> getAllAssignments(
+  public ResponseEntity<PagedResponse<AssignmentResponse>> getAllAssignments(
           @RequestParam(required = false) Long employeeId,
           @RequestParam(required = false) Long assetId,
+          @RequestParam(required = false) Boolean isActive,
           @RequestParam(defaultValue = "0") int page,
           @RequestParam(defaultValue = "20") int size,
           @RequestParam(defaultValue = "id") String sortBy,
           @RequestParam(defaultValue = "asc") String sortDir) {
 
-    if (employeeId != null) {
-      List<AssignmentResponse> assignments = assignmentService.getAssignmentsByEmployeeId(employeeId);
-      return ResponseEntity.ok(assignments);
-    }
-
-    if (assetId != null) {
-      List<AssignmentResponse> assignments = assignmentService.getAssignmentsByAssetId(assetId);
-      return ResponseEntity.ok(assignments);
-    }
-
     Sort sort = sortDir.equalsIgnoreCase("desc")
             ? Sort.by(sortBy).descending()
             : Sort.by(sortBy).ascending();
     Pageable pageable = PageRequest.of(page, size, sort);
-    PagedResponse<AssignmentResponse> assignments = assignmentService.getAllAssignments(pageable);
+    PagedResponse<AssignmentResponse> assignments = assignmentService.getAllAssignments(pageable, isActive, employeeId, assetId);
     return ResponseEntity.ok(assignments);
   }
 

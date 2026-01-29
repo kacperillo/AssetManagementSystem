@@ -1,6 +1,19 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Box, Button, Typography, Chip, IconButton, Tooltip } from '@mui/material';
+import {
+  Box,
+  Button,
+  Typography,
+  Chip,
+  IconButton,
+  Tooltip,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Paper,
+} from '@mui/material';
 import { Add, Stop } from '@mui/icons-material';
 import DataTable, { Column } from '../components/data/DataTable';
 import Pagination from '../components/data/Pagination';
@@ -8,9 +21,9 @@ import FilterDropdown from '../components/data/FilterDropdown';
 import CreateAssignmentModal from '../components/modals/CreateAssignmentModal';
 import EndAssignmentModal from '../components/modals/EndAssignmentModal';
 import ErrorMessage from '../components/feedback/ErrorMessage';
-import { getAssignments, Assignment } from '../api/assignments';
+import { getAssignments, Assignment, AssignmentFilters } from '../api/assignments';
 import { getEmployees } from '../api/employees';
-import { getAssets, PagedResponse, Asset } from '../api/assets';
+import { getAssets, Asset } from '../api/assets';
 
 const assetTypeLabels: Record<string, string> = {
   LAPTOP: 'Laptop',
@@ -20,32 +33,32 @@ const assetTypeLabels: Record<string, string> = {
   HEADPHONES: 'Słuchawki',
 };
 
+type StatusFilter = 'all' | 'active' | 'ended';
+
 export default function AssignmentsPage() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [employeeFilter, setEmployeeFilter] = useState<number | ''>('');
   const [assetFilter, setAssetFilter] = useState<number | ''>('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [endModalOpen, setEndModalOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
-  const hasFilters = employeeFilter !== '' || assetFilter !== '';
+  const filters: AssignmentFilters = {
+    employeeId: employeeFilter || undefined,
+    assetId: assetFilter || undefined,
+    isActive: statusFilter === 'all' ? null : statusFilter === 'active',
+  };
 
   const {
     data: assignmentsData,
     isLoading: assignmentsLoading,
     error: assignmentsError,
   } = useQuery({
-    queryKey: ['assignments', page, size, employeeFilter, assetFilter],
-    queryFn: () =>
-      getAssignments(
-        page,
-        size,
-        'id,asc',
-        employeeFilter || undefined,
-        assetFilter || undefined
-      ),
+    queryKey: ['assignments', page, size, employeeFilter, assetFilter, statusFilter],
+    queryFn: () => getAssignments(page, size, 'id,asc', filters),
   });
 
   const { data: employees = [] } = useQuery({
@@ -60,14 +73,8 @@ export default function AssignmentsPage() {
 
   const assets = assetsData?.content || [];
 
-  // Określ dane do wyświetlenia (z filtrami - tablica, bez - paginowane)
-  const assignments: Assignment[] = hasFilters
-    ? (assignmentsData as Assignment[]) || []
-    : (assignmentsData as PagedResponse<Assignment>)?.content || [];
-
-  const totalElements = hasFilters
-    ? assignments.length
-    : (assignmentsData as PagedResponse<Assignment>)?.totalElements || 0;
+  const assignments = assignmentsData?.content || [];
+  const totalElements = assignmentsData?.totalElements || 0;
 
   const handleEndAssignment = (assignment: Assignment) => {
     setSelectedAssignment(assignment);
@@ -149,26 +156,44 @@ export default function AssignmentsPage() {
         </Button>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <FilterDropdown
-          label="Filtruj po pracowniku"
-          options={employeeOptions}
-          value={employeeFilter}
-          onChange={(value) => {
-            setEmployeeFilter(value);
-            setPage(0);
-          }}
-        />
-        <FilterDropdown
-          label="Filtruj po zasobie"
-          options={assetOptions}
-          value={assetFilter}
-          onChange={(value) => {
-            setAssetFilter(value);
-            setPage(0);
-          }}
-        />
-      </Box>
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Box sx={{ display: 'flex', gap: 4, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Status</FormLabel>
+            <RadioGroup
+              row
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value as StatusFilter);
+                setPage(0);
+              }}
+            >
+              <FormControlLabel value="all" control={<Radio size="small" />} label="Wszystkie" />
+              <FormControlLabel value="active" control={<Radio size="small" />} label="Aktywne" />
+              <FormControlLabel value="ended" control={<Radio size="small" />} label="Zakończone" />
+            </RadioGroup>
+          </FormControl>
+
+          <FilterDropdown
+            label="Filtruj po pracowniku"
+            options={employeeOptions}
+            value={employeeFilter}
+            onChange={(value) => {
+              setEmployeeFilter(value);
+              setPage(0);
+            }}
+          />
+          <FilterDropdown
+            label="Filtruj po zasobie"
+            options={assetOptions}
+            value={assetFilter}
+            onChange={(value) => {
+              setAssetFilter(value);
+              setPage(0);
+            }}
+          />
+        </Box>
+      </Paper>
 
       {assignmentsError && <ErrorMessage message="Błąd podczas pobierania przydziałów" />}
 
@@ -179,7 +204,7 @@ export default function AssignmentsPage() {
         emptyMessage="Brak przydziałów w systemie"
       />
 
-      {!hasFilters && totalElements > 0 && (
+      {totalElements > 0 && (
         <Pagination
           page={page}
           size={size}

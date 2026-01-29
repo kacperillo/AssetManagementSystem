@@ -25,18 +25,26 @@ export interface EndAssignmentRequest {
   assignedUntil: string;
 }
 
+export interface AssignmentFilters {
+  employeeId?: number;
+  assetId?: number;
+  isActive?: boolean | null;
+}
+
 export const getAssignments = async (
   page: number = 0,
   size: number = 10,
   sort: string = 'id,asc',
-  employeeId?: number,
-  assetId?: number
-): Promise<PagedResponse<Assignment> | Assignment[]> => {
+  filters?: AssignmentFilters
+): Promise<PagedResponse<Assignment>> => {
   const params: Record<string, unknown> = { page, size, sort };
-  if (employeeId) params.employeeId = employeeId;
-  if (assetId) params.assetId = assetId;
+  if (filters?.employeeId) params.employeeId = filters.employeeId;
+  if (filters?.assetId) params.assetId = filters.assetId;
+  if (filters?.isActive !== undefined && filters.isActive !== null) {
+    params.isActive = filters.isActive;
+  }
 
-  const response = await apiClient.get('/admin/assignments', { params });
+  const response = await apiClient.get<PagedResponse<Assignment>>('/admin/assignments', { params });
   return response.data;
 };
 
