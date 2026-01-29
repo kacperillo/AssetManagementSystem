@@ -12,15 +12,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateAssetRequest {
 
-  @NotNull(message = "Asset type is required")
+  @NotNull(message = "Typ zasobu jest wymagany")
   private AssetType assetType;
 
-  @NotBlank(message = "Vendor is required")
+  @NotBlank(message = "Producent jest wymagany")
   private String vendor;
 
-  @NotBlank(message = "Model is required")
+  @NotBlank(message = "Model jest wymagany")
   private String model;
 
-  @NotBlank(message = "Series number is required")
+  @NotBlank(message = "Numer seryjny jest wymagany")
   private String seriesNumber;
 }

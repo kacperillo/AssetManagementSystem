@@ -33,7 +33,7 @@ public class AssetService {
   @Transactional
   public AssetResponse createAsset(CreateAssetRequest request) {
     if (assetRepository.existsBySeriesNumber(request.getSeriesNumber())) {
-      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Series number is already in use");
+      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Numer seryjny jest już używany");
     }
 
     Asset asset = new Asset();
@@ -85,7 +85,7 @@ public class AssetService {
   @Transactional(readOnly = true)
   public AssetResponse getAssetById(Long id) {
     Asset asset = assetRepository.findById(id)
-            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Asset not found"));
+            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Zasób nie został znaleziony"));
     Employee employee = assignmentRepository.findActiveByAssetId(id)
             .map(Assignment::getEmployee)
             .orElse(null);
@@ -95,11 +95,11 @@ public class AssetService {
   @Transactional
   public void deactivateAsset(Long id) {
     Asset asset = assetRepository.findById(id)
-            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Asset not found"));
+            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Zasób nie został znaleziony"));
 
     if (assignmentRepository.findActiveByAssetId(id).isPresent()) {
       throw new ApplicationException(HttpStatus.BAD_REQUEST,
-              "Cannot deactivate asset that is currently assigned to an employee");
+              "Nie można dezaktywować zasobu, który jest przypisany do pracownika");
     }
 
     asset.setActive(false);
@@ -109,10 +109,10 @@ public class AssetService {
   @Transactional(readOnly = true)
   public List<EmployeeAssetResponse> getActiveAssetsByEmployeeEmail(String email) {
     Employee employee = employeeRepository.findByEmail(email)
-            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Employee not found"));
+            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Pracownik nie został znaleziony"));
 
     return assignmentRepository.findActiveByEmployeeId(employee.getId()).stream()
-            .map(assignment -> this.mapToEmployeeAssetResponse(assignment.getAsset()))
+            .map(this::mapToEmployeeAssetResponse)
             .collect(Collectors.toList());
   }
 
@@ -134,13 +134,15 @@ public class AssetService {
     return response;
   }
 
-  private EmployeeAssetResponse mapToEmployeeAssetResponse(Asset asset) {
+  private EmployeeAssetResponse mapToEmployeeAssetResponse(Assignment assignment) {
+    Asset asset = assignment.getAsset();
     EmployeeAssetResponse response = new EmployeeAssetResponse();
     response.setAssetType(asset.getAssetType());
     response.setVendor(asset.getVendor());
     response.setModel(asset.getModel());
     response.setSeriesNumber(asset.getSeriesNumber());
-    
+    response.setAssignedFrom(assignment.getAssignedFrom());
+
     return response;
   }
 

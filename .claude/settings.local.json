@@ -1,8 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mvn clean compile:*)",
-      "Bash(find:*)"
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

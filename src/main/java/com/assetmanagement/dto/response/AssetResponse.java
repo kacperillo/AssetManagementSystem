@@ -1,6 +1,7 @@
 package com.assetmanagement.dto.response;
 
 import com.assetmanagement.model.AssetType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class AssetResponse {
   private String vendor;
   private String model;
   private String seriesNumber;
+  @JsonProperty("isActive")
   private boolean isActive;
   private Long assignedEmployeeId;
   private String assignedEmployeeFullName;

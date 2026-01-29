@@ -12,12 +12,12 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CreateAssignmentRequest {
 
-  @NotNull(message = "Employee ID is required")
+  @NotNull(message = "Pracownik jest wymagany")
   private Long employeeId;
 
-  @NotNull(message = "Asset ID is required")
+  @NotNull(message = "Zasób jest wymagany")
   private Long assetId;
 
-  @NotNull(message = "Assigned from date is required")
+  @NotNull(message = "Data rozpoczęcia jest wymagana")
   private LocalDate assignedFrom;
 }

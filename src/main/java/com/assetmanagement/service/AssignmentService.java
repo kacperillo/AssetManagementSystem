@@ -32,18 +32,18 @@ public class AssignmentService {
   @Transactional
   public AssignmentResponse createAssignment(CreateAssignmentRequest request) {
     Employee employee = employeeRepository.findById(request.getEmployeeId())
-            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Employee not found"));
+            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Pracownik nie został znaleziony"));
 
     Asset asset = assetRepository.findById(request.getAssetId())
-            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Asset not found"));
+            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Zasób nie został znaleziony"));
 
     if (!asset.isActive()) {
-      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Cannot assign inactive asset");
+      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Nie można przypisać nieaktywnego zasobu");
     }
 
     if (assignmentRepository.findActiveByAssetId(asset.getId()).isPresent()) {
       throw new ApplicationException(HttpStatus.BAD_REQUEST,
-              "Asset is already assigned to another employee");
+              "Zasób jest już przypisany do innego pracownika");
     }
 
     Assignment assignment = new Assignment();
@@ -58,10 +58,10 @@ public class AssignmentService {
   @Transactional
   public AssignmentResponse endAssignment(Long assignmentId, EndAssignmentRequest request) {
     Assignment assignment = assignmentRepository.findById(assignmentId)
-            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Assignment not found"));
+            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Przydział nie został znaleziony"));
 
     if (assignment.getAssignedUntil() != null) {
-      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Assignment is already ended");
+      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Przydział został już zakończony");
     }
 
     assignment.setAssignedUntil(request.getAssignedUntil());
@@ -97,7 +97,7 @@ public class AssignmentService {
   @Transactional(readOnly = true)
   public List<AssignmentResponse> getAssignmentsByEmployeeId(Long employeeId) {
     Employee employee = employeeRepository.findById(employeeId)
-            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Employee not found"));
+            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Pracownik nie został znaleziony"));
 
     return assignmentRepository.findByEmployee(employee).stream()
             .map(this::mapToResponse)
@@ -107,7 +107,7 @@ public class AssignmentService {
   @Transactional(readOnly = true)
   public List<AssignmentResponse> getAssignmentsByAssetId(Long assetId) {
     Asset asset = assetRepository.findById(assetId)
-            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Asset not found"));
+            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Zasób nie został znaleziony"));
 
     return assignmentRepository.findByAsset(asset).stream()
             .map(this::mapToResponse)
@@ -117,7 +117,7 @@ public class AssignmentService {
   @Transactional(readOnly = true)
   public List<AssignmentResponse> getAssignmentHistoryByEmployeeEmail(String email) {
     Employee employee = employeeRepository.findByEmail(email)
-            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Employee not found"));
+            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Pracownik nie został znaleziony"));
 
     return assignmentRepository.findByEmployee(employee).stream()
             .map(this::mapToResponse)

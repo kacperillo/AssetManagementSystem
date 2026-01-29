@@ -15,20 +15,20 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CreateEmployeeRequest {
 
-  @NotBlank(message = "Full name is required")
+  @NotBlank(message = "Imię i nazwisko jest wymagane")
   private String fullName;
 
-  @NotBlank(message = "Email is required")
-  @Email(message = "Email must be valid")
+  @NotBlank(message = "Email jest wymagany")
+  @Email(message = "Nieprawidłowy format email")
   private String email;
 
-  @NotBlank(message = "Password is required")
+  @NotBlank(message = "Hasło jest wymagane")
   private String password;
 
-  @NotNull(message = "Role is required")
+  @NotNull(message = "Rola jest wymagana")
   private Role role;
 
-  @NotNull(message = "Hired from date is required")
+  @NotNull(message = "Data zatrudnienia jest wymagana")
   private LocalDate hiredFrom;
 
   private LocalDate hiredUntil;

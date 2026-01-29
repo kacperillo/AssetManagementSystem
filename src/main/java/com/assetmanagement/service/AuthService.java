@@ -30,10 +30,13 @@ public class AuthService {
               new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
       );
     } catch (AuthenticationException e) {
-      throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+      throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Nieprawidłowy email lub hasło");
     }
 
-    final String token = jwtUtil.generateToken(request.getEmail());
+    Employee employee = employeeRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new ApplicationException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+
+    final String token = jwtUtil.generateToken(request.getEmail(), employee.getRole().name());
 
     return new LoginResponse(token);
   }
@@ -43,7 +46,7 @@ public class AuthService {
             .orElseThrow(() -> new ApplicationException(HttpStatus.BAD_REQUEST, "Invalid email or password"));
 
     if (!passwordEncoder.matches(request.getCurrentPassword(), employee.getPassword())) {
-      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Invalid email or password");
+      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Nieprawidłowy email lub hasło");
     }
 
     employee.setPassword(passwordEncoder.encode(request.getNewPassword()));

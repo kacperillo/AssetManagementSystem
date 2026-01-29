@@ -24,7 +24,7 @@ public class EmployeeService {
   @Transactional
   public EmployeeResponse createEmployee(CreateEmployeeRequest request) {
     if (employeeRepository.existsByEmail(request.getEmail())) {
-      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Email is already in use");
+      throw new ApplicationException(HttpStatus.BAD_REQUEST, "Ten adres email jest już używany");
     }
 
     Employee employee = new Employee();
@@ -49,7 +49,7 @@ public class EmployeeService {
   @Transactional(readOnly = true)
   public EmployeeResponse getEmployeeById(Long id) {
     Employee employee = employeeRepository.findById(id)
-            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Employee not found"));
+            .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Pracownik nie został znaleziony"));
     return mapToResponse(employee);
   }
 

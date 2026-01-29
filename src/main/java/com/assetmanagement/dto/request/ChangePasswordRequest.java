@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChangePasswordRequest {
 
-  @NotBlank(message = "Email is required")
-  @Email(message = "Email must be valid")
+  @NotBlank(message = "Email jest wymagany")
+  @Email(message = "Nieprawidłowy format email")
   private String email;
 
-  @NotBlank(message = "Current password is required")
+  @NotBlank(message = "Aktualne hasło jest wymagane")
   private String currentPassword;
 
-  @NotBlank(message = "New password is required")
+  @NotBlank(message = "Nowe hasło jest wymagane")
   private String newPassword;
 }

@@ -12,6 +12,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class EndAssignmentRequest {
 
-  @NotNull(message = "Assigned until date is required")
+  @NotNull(message = "Data zakończenia jest wymagana")
   private LocalDate assignedUntil;
 }

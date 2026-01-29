@@ -1,5 +1,6 @@
 package com.assetmanagement.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,5 +22,6 @@ public class AssignmentResponse {
   private String employeeFullName;
   private LocalDate assignedFrom;
   private LocalDate assignedUntil;
+  @JsonProperty("isActive")
   private boolean isActive;
 }
