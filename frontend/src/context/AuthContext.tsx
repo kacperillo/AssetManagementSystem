@@ -18,6 +18,7 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => void;
 }
@@ -31,6 +32,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -47,6 +49,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         localStorage.removeItem('token');
       }
     }
+    setIsLoading(false);
   }, []);
 
   const login = async (credentials: LoginRequest) => {
@@ -69,6 +72,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     token,
     isAuthenticated: !!token,
     isAdmin: user?.role === 'ADMIN',
+    isLoading,
     login,
     logout,
   };

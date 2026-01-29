@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,6 +11,7 @@ import {
   TextField,
   Button,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import { useAuth } from '../hooks/useAuth';
 import { AxiosError } from 'axios';
@@ -24,9 +25,15 @@ type FormData = z.infer<typeof schema>;
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, isAdmin } = useAuth();
+  const { login, isAdmin, isAuthenticated, isLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      navigate(isAdmin ? '/assets' : '/my-assets', { replace: true });
+    }
+  }, [isLoading, isAuthenticated, isAdmin, navigate]);
 
   const {
     register,
@@ -61,6 +68,14 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box
