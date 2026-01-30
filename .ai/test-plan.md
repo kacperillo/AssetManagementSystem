@@ -109,7 +109,7 @@ Poniżej znajduje się szczegółowy plan dla każdego typu testów.
         *   Klika "Add Asset", wypełnia formularz i zatwierdza.
         *   Sprawdza, czy nowy zasób pojawił się w tabeli.
         *   Edytuje zasób, zmieniając jego nazwę.
-        *   Usuwa zasób i potwierdza operację w oknie dialogowym.
+        *   Deaktywuje zasób i potwierdza operację w oknie dialogowym.
     3.  **Tworzenie przypisania (rola Admin):**
         *   Admin loguje się.
         *   Nawiguje do strony "Assignments", klika "Create Assignment".
