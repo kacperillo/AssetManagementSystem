@@ -132,6 +132,7 @@ export default function AssetsPage() {
                 color="warning"
                 onClick={() => handleDeactivate(row)}
                 disabled={!canDeactivate}
+                aria-label="Dezaktywuj"
               >
                 <Block />
               </IconButton>

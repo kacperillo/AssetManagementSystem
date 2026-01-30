@@ -24,7 +24,7 @@ test.describe('Zarządzanie zasobami (Admin)', () => {
     await expect(page.getByRole('cell', { name: uniqueSerial })).toBeVisible({ timeout: 5000 });
 
     // Krok 6-7: Filtruj aktywne i sprawdź wyniki
-    await page.getByRole('radio', { name: /aktywne/i }).click();
+    await page.getByRole('radio', { name: /^aktywne$/i }).click();
     await page.waitForTimeout(500);
     await expect(page.getByRole('cell', { name: uniqueSerial })).toBeVisible();
     await expect(page.getByText('SN-HEADPHONES-001')).not.toBeVisible(); // nieaktywny zasób ukryty
@@ -33,15 +33,12 @@ test.describe('Zarządzanie zasobami (Admin)', () => {
     const assetRow = page.locator('table tbody tr').filter({ hasText: uniqueSerial });
     await assetRow.getByRole('button', { name: /dezaktywuj/i }).click();
 
-    // Potwierdź w dialogu (jeśli istnieje)
-    const confirmButton = page.getByRole('button', { name: /potwierdź|tak/i });
-    if (await confirmButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-      await confirmButton.click();
-    }
+    // Potwierdź w dialogu
+    await page.getByRole('dialog').getByRole('button', { name: /dezaktywuj/i }).click();
     await page.waitForTimeout(1000);
 
     // Krok 9: Zmień filtr na "Nieaktywne"
-    await page.getByRole('radio', { name: /nieaktywne/i }).click();
+    await page.getByRole('radio', { name: /^nieaktywne$/i }).click();
     await page.waitForTimeout(500);
 
     // Krok 10: Potwierdź obecność zdezaktywowanego zasobu

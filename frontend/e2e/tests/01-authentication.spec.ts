@@ -29,8 +29,11 @@ test.describe('Uwierzytelnianie', () => {
     await page.getByLabel(/Hasło/i).fill('wrongpassword');
     await page.getByRole('button', { name: /zaloguj/i }).click();
 
-    await expect(page.getByRole('alert')).toBeVisible();
+    // Wait to ensure we stay on login page (wrong credentials)
+    await page.waitForTimeout(1000);
     await expect(page).toHaveURL(/\/login/);
+    // Check for error message
+    await expect(page.getByText(/nieprawidłowy email lub hasło/i)).toBeVisible({ timeout: 5000 });
   });
 
   test('AUTH-04: Wylogowanie', async ({ page }) => {
@@ -40,8 +43,9 @@ test.describe('Uwierzytelnianie', () => {
     await page.getByRole('button', { name: /zaloguj/i }).click();
     await expect(page).toHaveURL(/\/assets/);
 
-    // Wylogowanie
-    await page.getByRole('button', { name: /wyloguj/i }).click();
+    // Wylogowanie - click user menu first, then logout
+    await page.getByRole('button', { name: TEST_USERS.admin.email }).click();
+    await page.getByRole('menuitem', { name: /wyloguj/i }).click();
     await expect(page).toHaveURL(/\/login/);
   });
 });

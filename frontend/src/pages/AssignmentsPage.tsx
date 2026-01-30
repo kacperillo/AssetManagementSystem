@@ -124,6 +124,7 @@ export default function AssignmentsPage() {
               color="warning"
               onClick={() => handleEndAssignment(row)}
               disabled={!row.isActive}
+              aria-label="Zakończ"
             >
               <Stop />
             </IconButton>

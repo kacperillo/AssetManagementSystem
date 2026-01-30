@@ -1,11 +1,11 @@
 export const TEST_USERS = {
   admin: {
-    email: 'admin@test.com',
+    email: 'admin@example.com',
     password: 'admin123',
     role: 'ADMIN' as const,
   },
   employee: {
-    email: 'employee@test.com',
+    email: 'jan.kowalski@example.com',
     password: 'password123',
     role: 'EMPLOYEE' as const,
   },
