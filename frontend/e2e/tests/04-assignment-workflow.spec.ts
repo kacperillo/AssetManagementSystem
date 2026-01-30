@@ -1,0 +1,64 @@
+import { test, expect } from '../fixtures/auth.fixture';
+
+test.describe('Workflow przypisań (Admin)', () => {
+  test('Pełny cykl życia przypisania: utworzenie, weryfikacja, zakończenie', async ({ adminPage: page }) => {
+    // Krok 1-2: Przejdź do strony przydziałów
+    await page.goto('/assignments');
+    await expect(page.getByRole('heading', { name: 'Przydziały' })).toBeVisible();
+    await expect(page.locator('table')).toBeVisible();
+    await expect(page.getByRole('button', { name: /utwórz przydział/i })).toBeVisible();
+
+    // Krok 3: Otwórz modal tworzenia przydziału
+    await page.getByRole('button', { name: /utwórz przydział/i }).click();
+    await expect(page.getByRole('heading', { name: /utwórz przydział/i })).toBeVisible();
+
+    // Krok 4: Wybierz pracownika i zasób
+    await page.getByLabel('Pracownik').click();
+    await page.getByRole('option', { name: /test employee/i }).click();
+    await page.getByLabel('Zasób').click();
+    await page.getByRole('option', { name: /galaxy tab/i }).click();
+
+    // Krok 5: Zatwierdź utworzenie przypisania
+    await page.getByRole('button', { name: /^utwórz$/i }).click();
+    await expect(page.locator('table').getByText('Galaxy Tab S9')).toBeVisible({ timeout: 5000 });
+
+    // Krok 6-7: Przejdź do widoku zasobów i zaznacz filtr "Przypisane"
+    await page.goto('/assets');
+    await expect(page.getByRole('heading', { name: 'Zasoby' })).toBeVisible();
+    await page.getByLabel(/przypisanie/i).click();
+    await page.getByRole('option', { name: /przypisane/i }).click();
+    await page.waitForTimeout(500);
+
+    // Krok 8: Potwierdź obecność przypisanego zasobu (Galaxy Tab S9)
+    await expect(page.getByText('SN-TABLET-001')).toBeVisible();
+
+    // Krok 9: Wróć do przydziałów
+    await page.goto('/assignments');
+    await expect(page.getByRole('heading', { name: 'Przydziały' })).toBeVisible();
+
+    // Krok 10: Zakończ przydział
+    const assignmentRow = page.locator('table tbody tr').filter({ hasText: 'Galaxy Tab S9' });
+    await assignmentRow.getByRole('button', { name: /zakończ/i }).click();
+    const today = new Date().toISOString().split('T')[0];
+    await page.getByLabel(/data zakończenia/i).fill(today);
+    await page.getByRole('button', { name: /^zakończ$/i }).click();
+    await page.waitForTimeout(1000);
+
+    // Krok 11: Potwierdź zmianę statusu na "Zakończony"
+    await page.getByRole('radio', { name: /zakończone/i }).click();
+    await page.waitForTimeout(500);
+    const endedRow = page.locator('table tbody tr').filter({ hasText: 'Galaxy Tab S9' });
+    await expect(endedRow).toBeVisible();
+    await expect(endedRow.getByText(/zakończon/i)).toBeVisible();
+
+    // Krok 12-13: Przejdź do zasobów i zaznacz filtr "Nieprzypisane"
+    await page.goto('/assets');
+    await expect(page.getByRole('heading', { name: 'Zasoby' })).toBeVisible();
+    await page.getByLabel(/przypisanie/i).click();
+    await page.getByRole('option', { name: /nieprzypisane/i }).click();
+    await page.waitForTimeout(500);
+
+    // Krok 14: Potwierdź obecność zwolnionego zasobu (Galaxy Tab S9)
+    await expect(page.getByText('SN-TABLET-001')).toBeVisible();
+  });
+});

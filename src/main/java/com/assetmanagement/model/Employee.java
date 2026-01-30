@@ -18,8 +18,9 @@ import java.util.List;
 @Setter
 public class Employee {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "employee_seq")
-  @SequenceGenerator(name = "employee_seq", sequenceName = "employee_sequence", initialValue = 1000, allocationSize = 1)
+  // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "employee_seq")
+  // @SequenceGenerator(name = "employee_seq", sequenceName = "employee_sequence", initialValue = 1000, allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.IDENTITY) 
   private Long id;
 
   @Column(nullable = false)

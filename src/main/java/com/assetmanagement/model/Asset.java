@@ -15,8 +15,9 @@ import java.util.List;
 public class Asset {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "asset_seq")
-  @SequenceGenerator(name = "asset_seq", sequenceName = "asset_sequence", initialValue = 1000, allocationSize = 1)
+  // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "asset_seq")
+  // @SequenceGenerator(name = "asset_seq", sequenceName = "asset_sequence", initialValue = 1000, allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.IDENTITY) 
   private Long id;
 
   @Enumerated(EnumType.STRING)

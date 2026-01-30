@@ -25,8 +25,9 @@ import java.time.LocalDate;
 public class Assignment {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "assignment_seq")
-  @SequenceGenerator(name = "assignment_seq", sequenceName = "assignment_sequence", initialValue = 1000, allocationSize = 1)
+//   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "assignment_seq")
+//   @SequenceGenerator(name = "assignment_seq", sequenceName = "assignment_sequence", initialValue = 1000, allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.IDENTITY) 
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)

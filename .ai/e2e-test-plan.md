@@ -361,50 +361,68 @@ test.describe('Uwierzytelnianie', () => {
 
 **Plik**: `frontend/e2e/tests/02-asset-management.spec.ts`
 
-| ID | Przypadek testowy | Kroki | Oczekiwany rezultat |
-|----|-------------------|-------|---------------------|
-| ASSET-01 | Wyświetlenie listy zasobów | 1. Zaloguj jako Admin<br>2. Przejdź do /assets | Tabela z zasobami widoczna |
-| ASSET-02 | Dodanie nowego zasobu | 1. Kliknij "Dodaj zasób"<br>2. Wypełnij formularz<br>3. Zatwierdź | Zasób pojawia się w tabeli |
-| ASSET-03 | Filtrowanie zasobów | 1. Wybierz filtr "Aktywne"<br>2. Sprawdź wyniki | Tylko aktywne zasoby widoczne |
+| Krok | Akcja | Oczekiwany rezultat |
+|------|-------|---------------------|
+| 1 | Zaloguj jako Admin | Przekierowanie na /assets |
+| 2 | Przejdź do /assets | Tabela z zasobami widoczna |
+| 3 | Kliknij "Dodaj zasób" | Modal z formularzem |
+| 4 | Wypełnij formularz (typ, producent, model, nr seryjny) | Pola wypełnione |
+| 5 | Zatwierdź | Zasób pojawia się w tabeli |
+| 6 | Wybierz filtr "Aktywne" | Tylko aktywne zasoby widoczne |
+| 7 | Sprawdź wyniki | Nowy zasób widoczny, nieaktywne ukryte |
+| 8 | Dezaktywuj zasób | Dialog potwierdzenia → zasób dezaktywowany |
+| 9 | Zmień filtr na "Nieaktywne" | Lista nieaktywnych zasobów |
+| 10 | Potwierdź obecność zasobu | Zdezaktywowany zasób widoczny na liście |
 
 ```typescript
 import { test, expect } from '../fixtures/auth.fixture';
 
 test.describe('Zarządzanie zasobami (Admin)', () => {
-  test('ASSET-01: Wyświetlenie listy zasobów', async ({ adminPage: page }) => {
-    await expect(page.getByRole('heading', { name: 'Zasoby' })).toBeVisible();
-    await expect(page.locator('table')).toBeVisible();
-    await expect(page.getByRole('button', { name: /dodaj zasób/i })).toBeVisible();
-  });
-
-  test('ASSET-02: Dodanie nowego zasobu', async ({ adminPage: page }) => {
+  test('Pełny cykl zarządzania zasobem: dodanie, filtrowanie, dezaktywacja', async ({ adminPage: page }) => {
     const uniqueSerial = `SN-E2E-${Date.now()}`;
 
-    // Otwórz modal
+    // Krok 1-2: Po zalogowaniu jesteśmy na /assets
+    await expect(page.getByRole('heading', { name: 'Zasoby' })).toBeVisible();
+    await expect(page.locator('table')).toBeVisible();
+
+    // Krok 3: Otwórz modal dodawania zasobu
     await page.getByRole('button', { name: /dodaj zasób/i }).click();
     await expect(page.getByRole('heading', { name: /dodaj zasób/i })).toBeVisible();
 
-    // Wypełnij formularz
+    // Krok 4: Wypełnij formularz
     await page.getByLabel('Typ zasobu').click();
     await page.getByRole('option', { name: /tablet/i }).click();
     await page.getByLabel('Producent').fill('Microsoft');
     await page.getByLabel('Model').fill('Surface Pro');
     await page.getByLabel('Numer seryjny').fill(uniqueSerial);
 
-    // Zatwierdź
+    // Krok 5: Zatwierdź dodanie zasobu
     await page.getByRole('button', { name: /^dodaj$/i }).click();
-
-    // Weryfikacja
     await expect(page.getByRole('cell', { name: uniqueSerial })).toBeVisible({ timeout: 5000 });
-  });
 
-  test('ASSET-03: Filtrowanie zasobów po statusie', async ({ adminPage: page }) => {
-    // Filtruj aktywne
+    // Krok 6-7: Filtruj aktywne i sprawdź wyniki
     await page.getByRole('radio', { name: /aktywne/i }).click();
     await page.waitForTimeout(500);
+    await expect(page.getByRole('cell', { name: uniqueSerial })).toBeVisible();
+    await expect(page.getByText('SN-HEADPHONES-001')).not.toBeVisible(); // nieaktywny zasób ukryty
 
-    // Sprawdź czy nieaktywne zasoby nie są widoczne
-    await expect(page.getByText('SN-HEADPHONES-001')).not.toBeVisible();
+    // Krok 8: Dezaktywuj zasób
+    const assetRow = page.locator('table tbody tr').filter({ hasText: uniqueSerial });
+    await assetRow.getByRole('button', { name: /dezaktywuj/i }).click();
+
+    // Potwierdź w dialogu (jeśli istnieje)
+    const confirmButton = page.getByRole('button', { name: /potwierdź|tak/i });
+    if (await confirmButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await confirmButton.click();
+    }
+    await page.waitForTimeout(1000);
+
+    // Krok 9: Zmień filtr na "Nieaktywne"
+    await page.getByRole('radio', { name: /nieaktywne/i }).click();
+    await page.waitForTimeout(500);
+
+    // Krok 10: Potwierdź obecność zdezaktywowanego zasobu
+    await expect(page.getByRole('cell', { name: uniqueSerial })).toBeVisible({ timeout: 5000 });
   });
 });
 ```
@@ -415,31 +433,32 @@ test.describe('Zarządzanie zasobami (Admin)', () => {
 
 **Plik**: `frontend/e2e/tests/03-employee-management.spec.ts`
 
-| ID | Przypadek testowy | Kroki | Oczekiwany rezultat |
-|----|-------------------|-------|---------------------|
-| EMP-01 | Wyświetlenie listy pracowników | 1. Przejdź do /employees | Tabela z pracownikami widoczna |
-| EMP-02 | Dodanie nowego pracownika | 1. Kliknij "Dodaj pracownika"<br>2. Wypełnij formularz<br>3. Zatwierdź | Pracownik pojawia się w tabeli |
+| Krok | Akcja | Oczekiwany rezultat |
+|------|-------|---------------------|
+| 1 | Zaloguj jako Admin | Przekierowanie na /assets |
+| 2 | Przejdź do /employees | Tabela z pracownikami widoczna |
+| 3 | Kliknij "Dodaj pracownika" | Modal z formularzem |
+| 4 | Wypełnij formularz (imię, email, hasło, rola, data) | Pola wypełnione |
+| 5 | Zatwierdź | Pracownik pojawia się w tabeli |
+| 6 | Sprawdź obecność nowego pracownika | Pracownik widoczny z poprawnymi danymi |
 
 ```typescript
 import { test, expect } from '../fixtures/auth.fixture';
 
 test.describe('Zarządzanie pracownikami (Admin)', () => {
-  test('EMP-01: Wyświetlenie listy pracowników', async ({ adminPage: page }) => {
-    await page.goto('/employees');
+  test('Pełny cykl zarządzania pracownikiem: wyświetlenie listy i dodanie', async ({ adminPage: page }) => {
+    const uniqueEmail = `e2e.user.${Date.now()}@test.com`;
 
+    // Krok 1-2: Przejdź do strony pracowników
+    await page.goto('/employees');
     await expect(page.getByRole('heading', { name: 'Pracownicy' })).toBeVisible();
     await expect(page.locator('table')).toBeVisible();
     await expect(page.getByRole('button', { name: /dodaj pracownika/i })).toBeVisible();
-  });
 
-  test('EMP-02: Dodanie nowego pracownika', async ({ adminPage: page }) => {
-    await page.goto('/employees');
-    const uniqueEmail = `e2e.user.${Date.now()}@test.com`;
-
-    // Otwórz modal
+    // Krok 3: Otwórz modal dodawania pracownika
     await page.getByRole('button', { name: /dodaj pracownika/i }).click();
 
-    // Wypełnij formularz
+    // Krok 4: Wypełnij formularz
     await page.getByLabel(/imię i nazwisko/i).fill('Nowy Pracownik E2E');
     await page.getByLabel('Email').fill(uniqueEmail);
     await page.getByLabel(/hasło/i).fill('testpass123');
@@ -447,10 +466,10 @@ test.describe('Zarządzanie pracownikami (Admin)', () => {
     await page.getByRole('option', { name: /pracownik/i }).click();
     await page.getByLabel(/data zatrudnienia od/i).fill('2024-01-01');
 
-    // Zatwierdź
+    // Krok 5: Zatwierdź dodanie pracownika
     await page.getByRole('button', { name: /^dodaj$/i }).click();
 
-    // Weryfikacja
+    // Krok 6: Weryfikacja obecności nowego pracownika
     await expect(page.getByRole('cell', { name: uniqueEmail })).toBeVisible({ timeout: 5000 });
   });
 });
@@ -462,43 +481,86 @@ test.describe('Zarządzanie pracownikami (Admin)', () => {
 
 **Plik**: `frontend/e2e/tests/04-assignment-workflow.spec.ts`
 
-| ID | Przypadek testowy | Kroki | Oczekiwany rezultat |
-|----|-------------------|-------|---------------------|
-| ASSIGN-01 | Wyświetlenie listy przypisań | 1. Przejdź do /assignments | Tabela z przypisaniami widoczna |
-| ASSIGN-02 | Utworzenie nowego przypisania | 1. Kliknij "Utwórz przydział"<br>2. Wybierz pracownika i zasób<br>3. Zatwierdź | Przydział pojawia się w tabeli |
+| Krok | Akcja | Oczekiwany rezultat |
+|------|-------|---------------------|
+| 1 | Zaloguj jako Admin | Przekierowanie na /assets |
+| 2 | Przejdź do /assignments | Tabela z przypisaniami widoczna |
+| 3 | Kliknij "Utwórz przydział" | Modal z formularzem |
+| 4 | Wybierz pracownika i zasób | Pola wybrane |
+| 5 | Zatwierdź | Przydział pojawia się w tabeli |
+| 6 | Przejdź do /assets | Strona zasobów |
+| 7 | Zaznacz filtr "Przypisane" | Lista przypisanych zasobów |
+| 8 | Potwierdź obecność przypisanego zasobu | Zasób widoczny na liście |
+| 9 | Wróć do /assignments | Strona przydziałów |
+| 10 | Zakończ przydział (ustaw datę zakończenia) | Modal zamknięty |
+| 11 | Potwierdź zmianę statusu na "Zakończony" | Status zmieniony |
+| 12 | Przejdź do /assets | Strona zasobów |
+| 13 | Zaznacz filtr "Nieprzypisane" | Lista nieprzypisanych zasobów |
+| 14 | Potwierdź obecność zwolnionego zasobu | Zasób widoczny na liście |
 
 ```typescript
 import { test, expect } from '../fixtures/auth.fixture';
 
 test.describe('Workflow przypisań (Admin)', () => {
-  test('ASSIGN-01: Wyświetlenie listy przypisań', async ({ adminPage: page }) => {
+  test('Pełny cykl życia przypisania: utworzenie, weryfikacja, zakończenie', async ({ adminPage: page }) => {
+    // Krok 1-2: Przejdź do strony przydziałów
     await page.goto('/assignments');
-
     await expect(page.getByRole('heading', { name: 'Przydziały' })).toBeVisible();
     await expect(page.locator('table')).toBeVisible();
     await expect(page.getByRole('button', { name: /utwórz przydział/i })).toBeVisible();
-  });
 
-  test('ASSIGN-02: Utworzenie nowego przypisania', async ({ adminPage: page }) => {
-    await page.goto('/assignments');
-
-    // Otwórz modal
+    // Krok 3: Otwórz modal tworzenia przydziału
     await page.getByRole('button', { name: /utwórz przydział/i }).click();
     await expect(page.getByRole('heading', { name: /utwórz przydział/i })).toBeVisible();
 
-    // Wybierz pracownika
+    // Krok 4: Wybierz pracownika i zasób
     await page.getByLabel('Pracownik').click();
     await page.getByRole('option', { name: /test employee/i }).click();
-
-    // Wybierz dostępny zasób (smartphone - nieprzypisany)
     await page.getByLabel('Zasób').click();
-    await page.getByRole('option', { name: /iphone/i }).click();
+    await page.getByRole('option', { name: /galaxy tab/i }).click();
 
-    // Zatwierdź
+    // Krok 5: Zatwierdź utworzenie przypisania
     await page.getByRole('button', { name: /^utwórz$/i }).click();
+    await expect(page.locator('table').getByText('Galaxy Tab S9')).toBeVisible({ timeout: 5000 });
 
-    // Weryfikacja
-    await expect(page.locator('table').getByText('iPhone 14')).toBeVisible({ timeout: 5000 });
+    // Krok 6-7: Przejdź do widoku zasobów i zaznacz filtr "Przypisane"
+    await page.goto('/assets');
+    await expect(page.getByRole('heading', { name: 'Zasoby' })).toBeVisible();
+    await page.getByLabel(/przypisanie/i).click();
+    await page.getByRole('option', { name: /przypisane/i }).click();
+    await page.waitForTimeout(500);
+
+    // Krok 8: Potwierdź obecność przypisanego zasobu (Galaxy Tab S9)
+    await expect(page.getByText('SN-TABLET-001')).toBeVisible();
+
+    // Krok 9: Wróć do przydziałów
+    await page.goto('/assignments');
+    await expect(page.getByRole('heading', { name: 'Przydziały' })).toBeVisible();
+
+    // Krok 10: Zakończ przydział
+    const assignmentRow = page.locator('table tbody tr').filter({ hasText: 'Galaxy Tab S9' });
+    await assignmentRow.getByRole('button', { name: /zakończ/i }).click();
+    const today = new Date().toISOString().split('T')[0];
+    await page.getByLabel(/data zakończenia/i).fill(today);
+    await page.getByRole('button', { name: /^zakończ$/i }).click();
+    await page.waitForTimeout(1000);
+
+    // Krok 11: Potwierdź zmianę statusu na "Zakończony"
+    await page.getByRole('radio', { name: /zakończone/i }).click();
+    await page.waitForTimeout(500);
+    const endedRow = page.locator('table tbody tr').filter({ hasText: 'Galaxy Tab S9' });
+    await expect(endedRow).toBeVisible();
+    await expect(endedRow.getByText(/zakończon/i)).toBeVisible();
+
+    // Krok 12-13: Przejdź do zasobów i zaznacz filtr "Nieprzypisane"
+    await page.goto('/assets');
+    await expect(page.getByRole('heading', { name: 'Zasoby' })).toBeVisible();
+    await page.getByLabel(/przypisanie/i).click();
+    await page.getByRole('option', { name: /nieprzypisane/i }).click();
+    await page.waitForTimeout(500);
+
+    // Krok 14: Potwierdź obecność zwolnionego zasobu (Galaxy Tab S9)
+    await expect(page.getByText('SN-TABLET-001')).toBeVisible();
   });
 });
 ```
@@ -609,9 +671,9 @@ npm run e2e:debug                        # Tryb debug
 | ID | Scenariusz | Opis |
 |----|------------|------|
 | NEXT-01 | Zmiana hasła | Test procesu zmiany hasła przez użytkownika |
-| NEXT-02 | Dezaktywacja zasobu | Weryfikacja że przypisany zasób nie może być dezaktywowany |
-| NEXT-03 | Zakończenie przypisania | Test workflow zakończenia aktywnego przypisania |
-| NEXT-04 | Paginacja | Testowanie przewijania stron w tabelach |
+| NEXT-02 | Blokada dezaktywacji przypisanego zasobu | Weryfikacja że przypisany zasób nie może być dezaktywowany |
+| NEXT-03 | Paginacja | Testowanie przewijania stron w tabelach |
+| NEXT-04 | Sortowanie danych | Testowanie sortowania kolumn w tabelach |
 
 ### Średni priorytet
 
@@ -619,7 +681,7 @@ npm run e2e:debug                        # Tryb debug
 |----|------------|------|
 | NEXT-05 | Walidacja formularzy | Kompleksowe testy walidacji pól |
 | NEXT-06 | Wygaśnięcie sesji | Zachowanie po wygaśnięciu tokena JWT |
-| NEXT-07 | Kombinacje filtrów | Testowanie złożonych filtrów |
+| NEXT-07 | Kombinacje filtrów | Testowanie złożonych kombinacji filtrów |
 | NEXT-08 | Historia przypisań pracownika | Test strony /my-history |
 
 ### Niski priorytet
@@ -666,12 +728,12 @@ npm run e2e:debug                        # Tryb debug
 
 ## Podsumowanie
 
-Plan obejmuje **5 scenariuszy E2E** pokrywających:
-1. Uwierzytelnianie (logowanie/wylogowanie)
-2. Zarządzanie zasobami (CRUD)
-3. Zarządzanie pracownikami (CRUD)
-4. Workflow przypisań
-5. Widok pracownika i kontrola dostępu
+Plan obejmuje **5 scenariuszy E2E** (każdy jako pojedynczy kompleksowy test):
+1. **Uwierzytelnianie** - logowanie Admin/Pracownik, błędne dane, wylogowanie
+2. **Zarządzanie zasobami** - dodanie, filtrowanie, dezaktywacja, weryfikacja
+3. **Zarządzanie pracownikami** - wyświetlenie listy, dodanie nowego pracownika
+4. **Workflow przypisań** - pełny cykl: utworzenie → weryfikacja → zakończenie → weryfikacja
+5. **Widok pracownika** - własne zasoby, kontrola dostępu do stron admina
 
 **Kluczowe pliki do utworzenia/modyfikacji:**
 - `pom.xml` - dodanie H2
