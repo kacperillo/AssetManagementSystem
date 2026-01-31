@@ -148,12 +148,13 @@ npm run dev
 ### Backend
 ```bash
 cd backend
-mvn clean verify -DskipITs    # Testy jednostkowe
+mvn clean test     # Testy jednostkowe
 ```
 
 ### Frontend
 ```bash
 cd frontend
+npm install
 npm run test                   # Testy jednostkowe (Vitest)
 npm run test:coverage          # Testy z pokryciem
 npm run e2e                    # Testy E2E (Playwright)
@@ -183,7 +184,6 @@ mvn test                       # Testy
 ```bash
 npm run dev                    # Dev server
 npm run build                  # Build produkcyjny
-npm run lint                   # Linting
 ```
 
 ---
