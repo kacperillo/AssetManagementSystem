@@ -26,9 +26,7 @@ services:
   # Spring Boot Backend
   # ================================
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: kacperillo/assetmanagement-backend:latest
     container_name: assetmanagement-backend
     restart: unless-stopped
     environment:
@@ -51,9 +49,7 @@ services:
   # React Frontend (Nginx)
   # ================================
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: kacperillo/assetmanagement-frontend:latest
     container_name: assetmanagement-frontend
     restart: unless-stopped
     ports:
