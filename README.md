@@ -154,7 +154,8 @@ mvn clean test     # Testy jednostkowe
 ### Frontend
 ```bash
 cd frontend
-npm install
+npm install                    # Instaluj zależności
+npx playwright install         # Instaluj bibliotekę Playwright
 npm run test                   # Testy jednostkowe (Vitest)
 npm run test:coverage          # Testy z pokryciem
 npm run e2e                    # Testy E2E (Playwright)
