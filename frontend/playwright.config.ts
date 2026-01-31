@@ -24,7 +24,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'cd .. && mvn spring-boot:run -Dspring-boot.run.profiles=e2e',
+      command: 'cd ../backend && mvn spring-boot:run -Dspring-boot.run.profiles=e2e',
       url: 'http://localhost:8080/api/v1/auth/login',
       reuseExistingServer: !process.env.CI,
       timeout: 120000,

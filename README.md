@@ -45,7 +45,7 @@ Aplikacja automatycznie utworzy bazę danych `assetmanagement` przy pierwszym ur
 
 Jeśli potrzebujesz zmienić dane dostępowe do bazy, edytuj plik:
 ```
-src/main/resources/application.yaml
+backend/src/main/resources/application.yaml
 ```
 
 ```yaml
@@ -59,12 +59,14 @@ spring:
 ### 3. Kompilacja projektu
 
 ```bash
+cd backend
 mvn clean install
 ```
 
 ### 4. Uruchomienie aplikacji
 
 ```bash
+cd backend
 mvn spring-boot:run
 ```
 
@@ -190,25 +192,27 @@ Pełna dokumentacja API znajduje się w pliku [API_DOCUMENTATION.md](API_DOCUMEN
 
 ```
 AssetManagement/
-├── src/
-│   ├── main/
-│   │   ├── java/com/assetmanagement/
-│   │   │   ├── controller/        # REST Controllers
-│   │   │   ├── dto/               # Data Transfer Objects
-│   │   │   │   ├── request/       # Request DTOs
-│   │   │   │   └── response/      # Response DTOs
-│   │   │   ├── exception/         # Exception handling
-│   │   │   ├── model/             # JPA Entities
-│   │   │   ├── repository/        # Data access layer
-│   │   │   ├── security/          # Security configuration & JWT
-│   │   │   └── service/           # Business logic
-│   │   └── resources/
-│   │       ├── application.yaml   # Application configuration
-│   │       └── data.sql          # Sample data
-│   └── test/                      # Unit tests
-├── pom.xml                        # Maven configuration
-├── README.md                      # This file
-└── API_DOCUMENTATION.md           # API documentation
+├── backend/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/assetmanagement/
+│   │   │   │   ├── controller/        # REST Controllers
+│   │   │   │   ├── dto/               # Data Transfer Objects
+│   │   │   │   │   ├── request/       # Request DTOs
+│   │   │   │   │   └── response/      # Response DTOs
+│   │   │   │   ├── exception/         # Exception handling
+│   │   │   │   ├── model/             # JPA Entities
+│   │   │   │   ├── repository/        # Data access layer
+│   │   │   │   ├── security/          # Security configuration & JWT
+│   │   │   │   └── service/           # Business logic
+│   │   │   └── resources/
+│   │   │       ├── application.yaml   # Application configuration
+│   │   │       └── data.sql          # Sample data
+│   │   └── test/                      # Unit tests
+│   └── pom.xml                        # Maven configuration
+├── frontend/                          # React application
+├── README.md                          # This file
+└── API_DOCUMENTATION.md               # API documentation
 ```
 
 ## Bezpieczeństwo
@@ -253,21 +257,23 @@ AssetManagement/
 ### Uruchamianie testów
 
 ```bash
+cd backend
 mvn test
 ```
 
 ### Budowanie JAR
 
 ```bash
+cd backend
 mvn clean package
 ```
 
-Plik JAR będzie dostępny w `target/assetmanagement-0.0.1.jar`
+Plik JAR będzie dostępny w `backend/target/assetmanagement-0.0.1.jar`
 
 ### Uruchomienie aplikacji z JAR
 
 ```bash
-java -jar target/assetmanagement-0.0.1.jar
+java -jar backend/target/assetmanagement-0.0.1.jar
 ```
 
 ## Troubleshooting
@@ -276,13 +282,14 @@ java -jar target/assetmanagement-0.0.1.jar
 
 **Rozwiązanie:**
 - Upewnij się, że MySQL Server jest uruchomiony
-- Sprawdź dane dostępowe w `application.yaml`
+- Sprawdź dane dostępowe w `backend/src/main/resources/application.yaml`
 - Sprawdź, czy port 3306 jest dostępny
 
 ### Problem: Błąd kompilacji Maven
 
 **Rozwiązanie:**
 ```bash
+cd backend
 mvn clean install -U
 ```
 

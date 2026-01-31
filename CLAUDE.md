@@ -8,8 +8,9 @@ Full-stack IT asset management system with Spring Boot 4 backend (Java 21) and R
 
 ## Commands
 
-### Backend (Maven)
+### Backend (Maven - from backend/ directory)
 ```bash
+cd backend
 mvn clean verify -DskipITs          # Run unit tests
 mvn spring-boot:run                  # Start backend (port 8080)
 mvn spring-boot:run -Dspring-boot.run.profiles=e2e  # Start with e2e profile
@@ -33,7 +34,7 @@ docker-compose up -d     # Start full stack (MySQL, backend, frontend)
 
 ## Architecture
 
-### Backend Structure (src/main/java/com/assetmanagement/)
+### Backend Structure (backend/src/main/java/com/assetmanagement/)
 - **controller/** - REST endpoints: AuthController, EmployeeController, AssetController, AssignmentController
 - **service/** - Business logic with @Transactional operations
 - **repository/** - Spring Data JPA with custom queries
@@ -76,7 +77,7 @@ Employee (1) <-- (Many) Assignment (Many) --> (1) Asset
 
 ## Configuration
 
-- **Backend config:** src/main/resources/application.yaml (MySQL, JWT secret)
-- **Test config:** src/main/resources/application-test.yml (H2 database)
+- **Backend config:** backend/src/main/resources/application.yaml (MySQL, JWT secret)
+- **Test config:** backend/src/main/resources/application-test.yml (H2 database)
 - **Environment:** .env file for Docker (DB credentials, JWT secret)
 - **API base URL:** http://localhost:8080/api/v1
