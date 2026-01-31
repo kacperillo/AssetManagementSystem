@@ -6,12 +6,14 @@
 
 Aplikacja Asset Management System to webowa aplikacja biznesowa typu SPA (Single Page Application) służąca do zarządzania zasobami firmowymi i ich przydziałami pracownikom. Interfejs użytkownika jest zbudowany w oparciu o:
 
-- **Framework:** React z Vite
-- **Biblioteka UI:** Material-UI (MUI) v5
-- **Routing:** React Router v6
-- **Zarządzanie stanem:** React Query (TanStack Query) + React Context dla autentykacji
-- **Walidacja:** React Hook Form + Zod
+- **Framework:** React 19 z Vite 7
+- **Język:** TypeScript 5.9
+- **Biblioteka UI:** Material-UI (MUI) v7
+- **Routing:** React Router v7
+- **Zarządzanie stanem:** TanStack React Query v5 + React Context dla autentykacji
+- **Walidacja:** React Hook Form v7 + Zod
 - **HTTP Client:** Axios z interceptorami
+- **Testowanie:** Vitest (unit testy), Playwright (E2E)
 
 ### 1.2 Architektura dostępu
 
@@ -566,48 +568,49 @@ Mapowanie:
 ```
 src/
 ├── api/
-│   ├── client.js          # Axios instance + interceptory JWT
-│   ├── auth.js            # login(), changePassword()
-│   ├── employees.js       # getAll(), getById(), create()
-│   ├── assets.js          # getAll(), getById(), create(), deactivate()
-│   └── assignments.js     # getAll(), create(), end()
+│   ├── client.ts          # Axios instance + interceptory JWT
+│   ├── auth.ts            # login(), changePassword()
+│   ├── employees.ts       # getAll(), getById(), create()
+│   ├── assets.ts          # getAll(), getById(), create(), deactivate()
+│   └── assignments.ts     # getAll(), create(), end()
 ├── components/
 │   ├── layout/
-│   │   ├── Layout.jsx
-│   │   └── TopNavbar.jsx
+│   │   ├── Layout.tsx
+│   │   └── TopNavbar.tsx
 │   ├── routing/
-│   │   ├── ProtectedRoute.jsx
-│   │   └── AdminRoute.jsx
+│   │   ├── ProtectedRoute.tsx
+│   │   └── AdminRoute.tsx
 │   ├── data/
-│   │   ├── DataTable.jsx
-│   │   ├── Pagination.jsx
-│   │   └── FilterDropdown.jsx
+│   │   ├── DataTable.tsx
+│   │   ├── Pagination.tsx
+│   │   └── FilterDropdown.tsx
 │   ├── forms/
-│   │   ├── Modal.jsx
-│   │   ├── FormField.jsx
-│   │   └── ConfirmDialog.jsx
+│   │   ├── Modal.tsx
+│   │   ├── FormField.tsx
+│   │   └── ConfirmDialog.tsx
 │   ├── feedback/
-│   │   ├── LoadingSpinner.jsx
-│   │   ├── ErrorMessage.jsx
-│   │   └── EmptyState.jsx
+│   │   ├── LoadingSpinner.tsx
+│   │   ├── ErrorMessage.tsx
+│   │   └── EmptyState.tsx
 │   └── modals/
-│       ├── AddEmployeeModal.jsx
-│       ├── AddAssetModal.jsx
-│       ├── CreateAssignmentModal.jsx
-│       └── EndAssignmentModal.jsx
+│       ├── AddEmployeeModal.tsx
+│       ├── AddAssetModal.tsx
+│       ├── ChangePasswordModal.tsx
+│       ├── CreateAssignmentModal.tsx
+│       └── EndAssignmentModal.tsx
 ├── context/
-│   └── AuthContext.jsx    # token, user, login(), logout()
+│   └── AuthContext.tsx    # token, user, login(), logout()
 ├── hooks/
-│   └── useAuth.js         # Hook dostępu do AuthContext
+│   └── useAuth.ts         # Hook dostępu do AuthContext
 ├── pages/
-│   ├── LoginPage.jsx
-│   ├── EmployeesPage.jsx
-│   ├── AssetsPage.jsx
-│   ├── AssignmentsPage.jsx
-│   ├── MyAssetsPage.jsx
-│   └── MyHistoryPage.jsx
-├── App.jsx                # Routing + providers
-└── main.jsx               # Entry point
+│   ├── LoginPage.tsx
+│   ├── EmployeesPage.tsx
+│   ├── AssetsPage.tsx
+│   ├── AssignmentsPage.tsx
+│   ├── MyAssetsPage.tsx
+│   └── MyHistoryPage.tsx
+├── App.tsx                # Routing + providers
+└── main.tsx               # Entry point
 ```
 
 ---

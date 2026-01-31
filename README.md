@@ -89,7 +89,7 @@ Po pierwszym uruchomieniu możesz zalogować się używając:
 #### 1. Logowanie (Admin)
 
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@example.com",
@@ -110,7 +110,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 #### 2. Dodawanie pracownika (Admin)
 
 ```bash
-curl -X POST http://localhost:8080/api/admin/employees \
+curl -X POST http://localhost:8080/api/v1/admin/employees \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
   -d '{
@@ -125,7 +125,7 @@ curl -X POST http://localhost:8080/api/admin/employees \
 #### 3. Dodawanie zasobu (Admin)
 
 ```bash
-curl -X POST http://localhost:8080/api/admin/assets \
+curl -X POST http://localhost:8080/api/v1/admin/assets \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
   -d '{
@@ -139,7 +139,7 @@ curl -X POST http://localhost:8080/api/admin/assets \
 #### 4. Tworzenie przydziału (Admin)
 
 ```bash
-curl -X POST http://localhost:8080/api/admin/assignments \
+curl -X POST http://localhost:8080/api/v1/admin/assignments \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
   -d '{
@@ -152,7 +152,7 @@ curl -X POST http://localhost:8080/api/admin/assignments \
 #### 5. Wyświetlanie swoich aktywnych zasobów (Pracownik)
 
 ```bash
-curl -X GET http://localhost:8080/api/employee/assets/active \
+curl -X GET http://localhost:8080/api/v1/employee/assets \
   -H "Authorization: Bearer EMPLOYEE_TOKEN_HERE"
 ```
 
@@ -163,27 +163,28 @@ Pełna dokumentacja API znajduje się w pliku [API_DOCUMENTATION.md](API_DOCUMEN
 ### Główne endpointy
 
 **Autentykacja:**
-- `POST /api/auth/login` - Logowanie użytkownika
+- `POST /api/v1/auth/login` - Logowanie użytkownika
+- `POST /api/v1/auth/change-password` - Zmiana hasła
 
 **Zarządzanie pracownikami (ADMIN):**
-- `POST /api/admin/employees` - Dodawanie pracownika
-- `GET /api/admin/employees` - Lista wszystkich pracowników
-- `GET /api/admin/employees/{id}` - Szczegóły pracownika
+- `POST /api/v1/admin/employees` - Dodawanie pracownika
+- `GET /api/v1/admin/employees` - Lista wszystkich pracowników
+- `GET /api/v1/admin/employees/{id}` - Szczegóły pracownika
 
 **Zarządzanie zasobami (ADMIN):**
-- `POST /api/admin/assets` - Dodawanie zasobu
-- `GET /api/admin/assets` - Lista wszystkich zasobów
-- `GET /api/admin/assets/{id}` - Szczegóły zasobu
-- `PUT /api/admin/assets/{id}/deactivate` - Dezaktywacja zasobu
+- `POST /api/v1/admin/assets` - Dodawanie zasobu
+- `GET /api/v1/admin/assets` - Lista wszystkich zasobów (z paginacją i filtrowaniem)
+- `GET /api/v1/admin/assets/{id}` - Szczegóły zasobu
+- `PUT /api/v1/admin/assets/{id}/deactivate` - Dezaktywacja zasobu
 
 **Zarządzanie przydziałami (ADMIN):**
-- `POST /api/admin/assignments` - Tworzenie przydziału
-- `PUT /api/admin/assignments/{id}/end` - Kończenie przydziału
-- `GET /api/admin/assignments` - Historia przydziałów (z filtrowaniem)
+- `POST /api/v1/admin/assignments` - Tworzenie przydziału
+- `PUT /api/v1/admin/assignments/{id}/end` - Kończenie przydziału
+- `GET /api/v1/admin/assignments` - Historia przydziałów (z paginacją i filtrowaniem)
 
 **Funkcje pracownika (EMPLOYEE/ADMIN):**
-- `GET /api/employee/assets/active` - Aktywne zasoby pracownika
-- `GET /api/employee/assignments/history` - Historia przydziałów pracownika
+- `GET /api/v1/employee/assets` - Aktywne zasoby pracownika
+- `GET /api/v1/employee/assignments` - Historia przydziałów pracownika
 
 ## Struktura projektu
 

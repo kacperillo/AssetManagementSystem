@@ -8,7 +8,7 @@ Przechowuje informacje o pracownikach organizacji.
 
 | Kolumna | Typ danych | Ograniczenia | Opis |
 |---------|------------|--------------|------|
-| `id` | BIGINT | PRIMARY KEY, NOT NULL | Unikalny identyfikator pracownika (generowany sekwencją) |
+| `id` | BIGINT | PRIMARY KEY, NOT NULL, AUTO_INCREMENT | Unikalny identyfikator pracownika |
 | `full_name` | VARCHAR(255) | NOT NULL | Pełne imię i nazwisko pracownika |
 | `email` | VARCHAR(255) | NOT NULL, UNIQUE | Adres email pracownika (unikalny w systemie) |
 | `password` | VARCHAR(255) | NOT NULL | Zahashowane hasło pracownika |
@@ -16,7 +16,7 @@ Przechowuje informacje o pracownikach organizacji.
 | `hired_from` | DATE | NOT NULL | Data rozpoczęcia zatrudnienia |
 | `hired_until` | DATE | NULL | Data zakończenia zatrudnienia (NULL = aktywny pracownik) |
 
-**Sekwencja:** `employee_sequence` (wartość początkowa: 1000, krok alokacji: 1)
+**Strategia ID:** `AUTO_INCREMENT` (GenerationType.IDENTITY)
 
 ---
 
@@ -26,14 +26,14 @@ Przechowuje informacje o zasobach IT (sprzęcie) w organizacji.
 
 | Kolumna | Typ danych | Ograniczenia | Opis |
 |---------|------------|--------------|------|
-| `id` | BIGINT | PRIMARY KEY, NOT NULL | Unikalny identyfikator zasobu (generowany sekwencją) |
+| `id` | BIGINT | PRIMARY KEY, NOT NULL, AUTO_INCREMENT | Unikalny identyfikator zasobu |
 | `asset_type` | VARCHAR(50) | NOT NULL | Typ zasobu (ENUM: LAPTOP, SMARTPHONE, TABLET, PRINTER, HEADPHONES) |
 | `vendor` | VARCHAR(255) | NOT NULL | Producent/dostawca sprzętu |
 | `model` | VARCHAR(255) | NOT NULL | Model sprzętu |
 | `series_number` | VARCHAR(255) | NOT NULL, UNIQUE | Numer seryjny (unikalny w systemie) |
 | `is_active` | BOOLEAN | NOT NULL, DEFAULT TRUE | Status aktywności zasobu |
 
-**Sekwencja:** `asset_sequence` (wartość początkowa: 1000, krok alokacji: 1)
+**Strategia ID:** `AUTO_INCREMENT` (GenerationType.IDENTITY)
 
 ---
 
@@ -43,13 +43,13 @@ Tabela łącząca reprezentująca przypisania zasobów do pracowników z informa
 
 | Kolumna | Typ danych | Ograniczenia | Opis |
 |---------|------------|--------------|------|
-| `id` | BIGINT | PRIMARY KEY, NOT NULL | Unikalny identyfikator przypisania (generowany sekwencją) |
+| `id` | BIGINT | PRIMARY KEY, NOT NULL, AUTO_INCREMENT | Unikalny identyfikator przypisania |
 | `asset_id` | BIGINT | NOT NULL, FOREIGN KEY | Identyfikator przypisanego zasobu |
 | `employee_id` | BIGINT | NOT NULL, FOREIGN KEY | Identyfikator pracownika |
 | `assigned_from` | DATE | NOT NULL | Data rozpoczęcia przypisania |
 | `assigned_until` | DATE | NULL | Data zakończenia przypisania (NULL = aktywne przypisanie) |
 
-**Sekwencja:** `assignment_sequence` (wartość początkowa: 1000, krok alokacji: 1)
+**Strategia ID:** `AUTO_INCREMENT` (GenerationType.IDENTITY)
 
 ---
 
@@ -176,20 +176,12 @@ Przechowywane jako VARCHAR z wartościami:
 
 ## 5. Skrypty DDL
 
-### 5.1 Tworzenie Sekwencji
-
-```sql
-CREATE SEQUENCE employee_sequence START WITH 1000 INCREMENT BY 1;
-CREATE SEQUENCE asset_sequence START WITH 1000 INCREMENT BY 1;
-CREATE SEQUENCE assignment_sequence START WITH 1000 INCREMENT BY 1;
-```
-
-### 5.2 Tworzenie Tabel
+### 5.1 Tworzenie Tabel
 
 ```sql
 -- Tabela pracowników
 CREATE TABLE employees (
-    id BIGINT NOT NULL DEFAULT nextval('employee_sequence'),
+    id BIGINT NOT NULL AUTO_INCREMENT,
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -203,7 +195,7 @@ CREATE TABLE employees (
 
 -- Tabela zasobów
 CREATE TABLE assets (
-    id BIGINT NOT NULL DEFAULT nextval('asset_sequence'),
+    id BIGINT NOT NULL AUTO_INCREMENT,
     asset_type VARCHAR(50) NOT NULL,
     vendor VARCHAR(255) NOT NULL,
     model VARCHAR(255) NOT NULL,
@@ -216,7 +208,7 @@ CREATE TABLE assets (
 
 -- Tabela przypisań
 CREATE TABLE assignments (
-    id BIGINT NOT NULL DEFAULT nextval('assignment_sequence'),
+    id BIGINT NOT NULL AUTO_INCREMENT,
     asset_id BIGINT NOT NULL,
     employee_id BIGINT NOT NULL,
     assigned_from DATE NOT NULL,
@@ -239,8 +231,8 @@ CREATE INDEX idx_assignment_assigned_until ON assignments(assigned_until);
 
 ### 6.1 Strategia Generowania Kluczy
 
-- **Sekwencje z wartością początkową 1000** - pozwala na rezerwację niższych ID dla danych testowych lub systemowych
-- **Krok alokacji 1** - zapewnia ciągłość numeracji bez przerw
+- **AUTO_INCREMENT (GenerationType.IDENTITY)** - automatyczne generowanie ID przez bazę danych MySQL
+- Zapewnia prostotę i wydajność dla bazy MySQL
 
 ### 6.2 Strategia Przechowywania Enumów
 

@@ -62,7 +62,7 @@ Poniżej znajduje się szczegółowy plan dla każdego typu testów.
     *   Komponent `FormField`: Sprawdzenie, czy poprawnie wyświetla komunikat błędu, gdy otrzyma `error` w propsach.
     *   Komponent `EmptyState`: Weryfikacja, czy renderuje poprawny tekst i obrazek.
     *   Hook `useAuth`: Testowanie logiki `login` i `logout`, sprawdzając zmiany w zwracanym kontekście.
-*   **Narzędzia:** Jest, React Testing Library (RTL). Zależności (API, konteksty) muszą być mockowane.
+*   **Narzędzia:** Vitest, React Testing Library (RTL). Zależności (API, konteksty) muszą być mockowane.
 
 ### 3.2. Testy Integracyjne (Integration Tests) - Backend
 
@@ -92,7 +92,7 @@ Poniżej znajduje się szczegółowy plan dla każdego typu testów.
     *   `GET /api/employees`: Sprawdzenie, czy odpowiedź jest zgodna ze schematem `PagedResponse<EmployeeResponse>`, czy paginacja (`?page=1&size=10`) działa poprawnie.
     *   `POST /api/assignments`: Próba stworzenia przypisania dla nieistniejącego zasobu i weryfikacja odpowiedzi `404 Not Found`.
     *   `DELETE /api/assets/{id}`: Sprawdzenie, czy po usunięciu zasobu, żądanie `GET` na jego ID zwraca `404`.
-*   **Narzędzia:** Postman/Insomnia (do testów manualnych/eksploracyjnych), RestAssured (Java) lub Cypress/Playwright (`cy.request`) do automatyzacji.
+*   **Narzędzia:** Postman/Insomnia (do testów manualnych/eksploracyjnych), RestAssured (Java) lub Playwright (`request`) do automatyzacji.
 
 ### 3.4. Testy End-to-End (E2E)
 
@@ -118,7 +118,7 @@ Poniżej znajduje się szczegółowy plan dla każdego typu testów.
     4.  **Przeglądanie własnych zasobów (rola User):**
         *   Użytkownik loguje się.
         *   Nawiguje do "My Assets" i widzi tylko przypisane do niego zasoby.
-*   **Narzędzia:** Cypress, Playwright.
+*   **Narzędzia:** Playwright.
 
 ### 3.5. Testy Wydajnościowe (Performance Tests)
 
@@ -157,10 +157,10 @@ Poniżej znajduje się szczegółowy plan dla każdego typu testów.
 *   **Kryteria wyjścia:** Scenariusze awaryjne są obsługiwane bez "wykrzaczania" aplikacji.
 *   **Zakres:** Reakcja frontendu na błędy API, zachowanie backendu przy niedostępności bazy danych.
 *   **Przykładowe Scenariusze:**
-    *   **Frontend:** Za pomocą mocka (np. w Cypress) symulacja odpowiedzi API z kodem `500 Internal Server Error` i weryfikacja, czy na UI pojawił się komponent `ErrorMessage`.
+    *   **Frontend:** Za pomocą mocka (np. w Playwright) symulacja odpowiedzi API z kodem `500 Internal Server Error` i weryfikacja, czy na UI pojawił się komponent `ErrorMessage`.
     *   **Frontend:** Symulacja powolnej odpowiedzi sieci i sprawdzenie, czy wyświetla się `LoadingSpinner`.
     *   **Backend:** Zatrzymanie kontenera z bazą danych i sprawdzenie, czy API zwraca spójny błąd `500` lub `503`, zamiast kończyć pracę.
-*   **Narzędzia:** Cypress/Playwright Intercepts, Mockito (do symulacji wyjątków w testach integracyjnych), Chaos Engineering tools (opcjonalnie).
+*   **Narzędzia:** Playwright Intercepts, Mockito (do symulacji wyjątków w testach integracyjnych), Chaos Engineering tools (opcjonalnie).
 
 ## 4. Podsumowanie i Rekomendacje CI/CD
 

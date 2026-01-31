@@ -59,12 +59,8 @@
 }
 ```
 
-**Success Response (200 OK):**
-```json
-{
-  "message": "Password changed successfully"
-}
-```
+**Success Response (204 No Content):**
+No response body.
 
 **Error Responses:**
 | Code | Message |
@@ -246,8 +242,12 @@
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | page | int | 0 | Page number (0-indexed) |
-| size | int | 10 | Page size |
-| sort | string | id,asc | Sort field and direction |
+| size | int | 20 | Page size |
+| sortBy | string | id | Sort field |
+| sortDir | string | asc | Sort direction (asc/desc) |
+| isActive | Boolean | null | Filter by active status |
+| assetType | string | null | Filter by asset type (LAPTOP, SMARTPHONE, etc.) |
+| isAssigned | Boolean | null | Filter by assignment status |
 
 **Success Response (200 OK):**
 ```json
@@ -327,20 +327,8 @@
 
 **Request Body:** None
 
-**Success Response (200 OK):**
-```json
-{
-  "id": 1000,
-  "assetType": "LAPTOP",
-  "vendor": "Dell",
-  "model": "XPS 15",
-  "seriesNumber": "SN-12345-ABCDE",
-  "isActive": false,
-  "assignedEmployeeId": null,
-  "assignedEmployeeFullName": null,
-  "assignedEmployeeEmail": null
-}
-```
+**Success Response (204 No Content):**
+No response body.
 
 **Error Responses:**
 | Code | Message |
@@ -426,12 +414,12 @@
 | 400 | Employee ID is required |
 | 400 | Asset ID is required |
 | 400 | Assigned from date is required |
+| 400 | Cannot assign inactive asset |
+| 400 | Asset is already assigned to another employee |
 | 401 | Unauthorized |
 | 403 | Access denied |
 | 404 | Employee not found |
 | 404 | Asset not found |
-| 409 | Asset is not active |
-| 409 | Asset is already assigned to another employee |
 
 ---
 
@@ -473,10 +461,11 @@
 | Code | Message |
 |------|---------|
 | 400 | Assigned until date is required |
+| 400 | End date cannot be before start date |
 | 401 | Unauthorized |
 | 403 | Access denied |
 | 404 | Assignment not found |
-| 409 | Assignment is already ended |
+| 400 | Assignment is already ended |
 
 ---
 
@@ -489,14 +478,15 @@
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | page | int | No | Page number (default: 0) |
-| size | int | No | Page size (default: 10) |
-| sort | string | No | Sort field and direction (default: id,asc) |
+| size | int | No | Page size (default: 20) |
+| sortBy | string | No | Sort field (default: id) |
+| sortDir | string | No | Sort direction (default: asc) |
 | employeeId | Long | No | Filter by employee ID |
 | assetId | Long | No | Filter by asset ID |
+| isActive | Boolean | No | Filter by active status |
 
 **Success Response (200 OK):**
 
-*When no filters are applied:*
 ```json
 {
   "content": [
@@ -515,30 +505,11 @@
     }
   ],
   "page": 0,
-  "size": 10,
+  "size": 20,
   "totalElements": 25,
-  "totalPages": 3,
+  "totalPages": 2,
   "last": false
 }
-```
-
-*When employeeId or assetId filter is applied:*
-```json
-[
-  {
-    "id": 1000,
-    "assetId": 1000,
-    "assetType": "LAPTOP",
-    "vendor": "Dell",
-    "model": "XPS 15",
-    "seriesNumber": "SN-12345-ABCDE",
-    "employeeId": 1000,
-    "employeeFullName": "John Doe",
-    "assignedFrom": "2024-01-15",
-    "assignedUntil": null,
-    "isActive": true
-  }
-]
 ```
 
 **Error Responses:**
@@ -649,7 +620,7 @@ The API uses **JWT (JSON Web Token)** based authentication with the following ch
 
 - **Password Storage:** BCrypt hashing algorithm
 - **CSRF Protection:** Disabled (stateless API)
-- **CORS:** Configured for `http://localhost:3000`
+- **CORS:** Configured for `http://localhost:5173`
 - **Access Denied Response:** Custom JSON response with 403 status
 
 ### 3.7 Error Response Format
@@ -714,20 +685,21 @@ The API uses **JWT (JSON Web Token)** based authentication with the following ch
 **Business Logic:**
 
 1. **Assignment Creation:**
-   - Employee must exist in the system
-   - Asset must exist in the system
-   - Asset must be active (`isActive = true`)
-   - Asset cannot have an existing active assignment (no double assignment)
+   - Employee must exist in the system (404 if not found)
+   - Asset must exist in the system (404 if not found)
+   - Asset must be active (`isActive = true`) - returns 400 if inactive
+   - Asset cannot have an existing active assignment (no double assignment) - returns 400 if already assigned
    - An active assignment is one where `assignedUntil IS NULL`
 
 2. **Assignment Termination:**
-   - Assignment must exist
-   - Assignment cannot already be ended (`assignedUntil` must be null)
+   - Assignment must exist (404 if not found)
+   - Assignment cannot already be ended (`assignedUntil` must be null) - returns 400 if already ended
+   - **Date validation:** `assignedUntil` cannot be before `assignedFrom` - returns 400 if end date is before start date
    - Sets `assignedUntil` to provided date
 
 3. **Active Assignment Logic:**
    - Assignment is considered active when `assignedUntil IS NULL`
-   - `isActive` field in response is calculated based on current date and `assignedUntil`
+   - `isActive` field in response is calculated: `true` if `assignedUntil IS NULL`, `false` otherwise
 
 ---
 
@@ -766,11 +738,12 @@ All validation and business logic errors return a consistent format:
 |------|-------|
 | 200 OK | Successful GET, PUT requests |
 | 201 Created | Successful POST (resource creation) |
-| 400 Bad Request | Validation errors |
+| 204 No Content | Successful operation with no response body (change-password, deactivate) |
+| 400 Bad Request | Validation errors and business rule violations (inactive asset, already assigned, invalid dates) |
 | 401 Unauthorized | Invalid or missing authentication |
 | 403 Forbidden | Insufficient permissions |
 | 404 Not Found | Resource not found |
-| 409 Conflict | Business rule violation (duplicate, invalid state) |
+| 409 Conflict | Duplicate resource (email, series number already exists) |
 | 500 Internal Server Error | Unexpected server errors |
 
 ---
