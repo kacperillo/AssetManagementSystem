@@ -33,8 +33,8 @@ Przed uruchomieniem aplikacji upewnij się, że masz zainstalowane:
 ### 1. Sklonuj repozytorium
 
 ```bash
-git clone <repository-url>
-cd AssetManagement
+git clone https://github.com/kacperillo/AssetManagementSystem
+cd AssetManagementSystem
 ```
 
 ### 2. Konfiguracja bazy danych
