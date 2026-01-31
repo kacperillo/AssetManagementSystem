@@ -1,0 +1,35 @@
+# Build output
+target/
+!target/*.jar
+
+# Frontend (osobny kontener)
+frontend/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Documentation
+*.md
+.ai/
+
+# Docker
+docker-compose.yml
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db

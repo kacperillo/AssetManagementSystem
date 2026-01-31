@@ -3,21 +3,26 @@ spring:
     name: AssetManagement
 
   datasource:
-    url: jdbc:mysql://localhost:3306/assetmanagement?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-    username: root
-    password: root
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/assetmanagement?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    defer-datasource-initialization: ${SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION:false}
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
 
+  sql:
+    init:
+      mode: ${SPRING_SQL_INIT_MODE:never}
+
 jwt:
-  secret: eec6fbed57322cfb2fff873b8495121553bd4b0cbf7153f067a8edf3cba41da2
-  expiration: 86400000
+  secret: ${JWT_SECRET:eec6fbed57322cfb2fff873b8495121553bd4b0cbf7153f067a8edf3cba41da2}
+  expiration: ${JWT_EXPIRATION:86400000}
 

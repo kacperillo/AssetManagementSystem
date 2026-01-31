@@ -1,13 +1,5 @@
--- Insert sample admin user
--- Password: admin123 (BCrypt hash)
-INSERT INTO employees (full_name, email, password, role, hired_from, hired_until)
-VALUES ('Administrator', 'admin@example.com', '$2y$10$ceqHIK6g4SR2nsTS8wHRcOj5rfJF/I4dIfT4mbeEklTfFkR16QRSm', 'ADMIN', '2023-01-01', NULL)
-ON DUPLICATE KEY UPDATE full_name=full_name;
+INSERT IGNORE INTO `employees` VALUES (1,'admin@example.com','Administrator','2023-01-01',NULL,'$2y$10$ceqHIK6g4SR2nsTS8wHRcOj5rfJF/I4dIfT4mbeEklTfFkR16QRSm','ADMIN'),(2,'jan.kowalski@example.com','Jan Kowalski','2023-06-15',NULL,'$2y$10$BLGzSIgcbY2f63yA.9A.IO3zQsG/kA/vj0wtHU7fdjVwYY.VsWFY6','EMPLOYEE'),(3,'jan.nowak@example.com','Jan Nowak','2025-01-01',NULL,'$2a$10$H5mp3uNEBTI/Od0aVdiCEOBysFGvS9eiqw7dEU.2jzFoBQWRo75p6','EMPLOYEE');
 
--- Insert sample employee user
--- Password: password123 (BCrypt hash)
-INSERT INTO employees (full_name, email, password, role, hired_from, hired_until)
-VALUES ('Jan Kowalski', 'jan.kowalski@example.com', '$2y$10$BLGzSIgcbY2f63yA.9A.IO3zQsG/kA/vj0wtHU7fdjVwYY.VsWFY6', 'EMPLOYEE', '2023-06-15', NULL)
-ON DUPLICATE KEY UPDATE full_name=full_name;
+INSERT IGNORE INTO `assets` VALUES (1,'LAPTOP',_binary '\0','XPS 13','DL-XPS13-001','Dell'),(2,'LAPTOP',_binary '','MacBook Pro 14','AP-MBP14-002','Apple'),(3,'LAPTOP',_binary '','ThinkPad T14','LN-T14-003','Lenovo'),(4,'LAPTOP',_binary '','EliteBook 840','HP-EB840-004','HP'),(5,'SMARTPHONE',_binary '','iPhone 14','AP-IP14-005','Apple'),(6,'SMARTPHONE',_binary '','Galaxy S23','SM-S23-006','Samsung'),(7,'SMARTPHONE',_binary '','Pixel 8','GG-P8-007','Google'),(8,'SMARTPHONE',_binary '','Mi 13','XM-M13-008','Xiaomi'),(9,'TABLET',_binary '','iPad Pro 11','AP-IPD11-009','Apple'),(10,'TABLET',_binary '\0','Galaxy Tab S9','SM-TS9-010','Samsung'),(11,'TABLET',_binary '','Tab P11','LN-P11-011','Lenovo'),(12,'PRINTER',_binary '','LaserJet Pro','HP-LJ-012','HP'),(13,'PRINTER',_binary '','HL-L2350DW','BR-HL2350-013','Brother'),(14,'PRINTER',_binary '','PIXMA G6040','CN-G6040-014','Canon'),(15,'HEADPHONES',_binary '','WH-1000XM5','SN-XM5-015','Sony'),(16,'HEADPHONES',_binary '','QC45','BS-QC45-016','Bose'),(17,'HEADPHONES',_binary '','AirPods Pro 2','AP-APP2-017','Apple'),(18,'HEADPHONES',_binary '','Momentum 4','SE-M4-018','Sennheiser'),(19,'SMARTPHONE',_binary '','11 Pro','OP-11P-019','OnePlus'),(20,'LAPTOP',_binary '','MacBook Pro 14','AP-MBP14-020','Apple'),(21,'SMARTPHONE',_binary '','Galaxy A54','SM-GA54-020','Samsung');
 
-
+INSERT IGNORE INTO `assignments` VALUES (1,'2025-01-27','2026-01-28',1,2),(2,'2022-01-29','2024-10-05',1,3),(3,'2025-01-26','2026-01-28',21,2),(4,'2024-01-21',NULL,20,3),(5,'2026-01-14',NULL,9,2);
