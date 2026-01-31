@@ -60,7 +60,7 @@ Najprostszy sposób uruchomienia całej aplikacji.
 ```bash
 # 1. Sklonuj repozytorium
 git clone https://github.com/kacperillo/AssetManagementSystem
-cd AssetManagement
+cd AssetManagementSystem
 
 # 2. Uruchom wszystkie serwisy
 docker-compose up -d
@@ -75,6 +75,17 @@ docker-compose ps
 |--------|-----|
 | Frontend | http://localhost |
 | Backend API | http://localhost:8080/api/v1 |
+
+## Domyślni użytkownicy
+
+Po uruchomieniu aplikacji dostępni są testowi użytkownicy:
+
+| Rola | Email | Hasło |
+|------|-------|-------|
+| Administrator | `admin@example.com` | `admin123` |
+| Pracownik | `jan.kowalski@example.com` | `password123` |
+
+---
 
 ### Zatrzymanie
 
@@ -129,17 +140,6 @@ npm run dev
 |--------|-----|
 | Frontend | http://localhost:5173 |
 | Backend API | http://localhost:8080/api/v1 |
-
----
-
-## Domyślni użytkownicy
-
-Po uruchomieniu aplikacji dostępni są testowi użytkownicy:
-
-| Rola | Email | Hasło |
-|------|-------|-------|
-| Administrator | `admin@example.com` | `admin123` |
-| Pracownik | `jan.kowalski@example.com` | `employee123` |
 
 ---
 

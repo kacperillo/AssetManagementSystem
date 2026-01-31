@@ -100,7 +100,7 @@ VALUES (1, 'Test Admin', 'admin@test.com',
         '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
         'ADMIN', '2023-01-01', NULL);
 
--- Pracownik (hasło: employee123)
+-- Pracownik (hasło: password123)
 INSERT INTO employees (id, full_name, email, password, role, hired_from, hired_until)
 VALUES (2, 'Test Employee', 'employee@test.com',
         '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
@@ -241,13 +241,13 @@ frontend/
 ```typescript
 export const TEST_USERS = {
   admin: {
-    email: 'admin@test.com',
+    email: 'admin@example.com',
     password: 'admin123',
     role: 'ADMIN' as const,
   },
   employee: {
-    email: 'employee@test.com',
-    password: 'employee123',
+    email: 'jan.kowalski@example.com',
+    password: 'password123',
     role: 'EMPLOYEE' as const,
   },
 };

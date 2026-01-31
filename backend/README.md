@@ -84,7 +84,7 @@ Po pierwszym uruchomieniu możesz zalogować się używając:
 
 **Pracownik:**
 - Email: `jan.kowalski@example.com`
-- Hasło: `employee123`
+- Hasło: `password123`
 
 ### Przykładowe żądania
 
